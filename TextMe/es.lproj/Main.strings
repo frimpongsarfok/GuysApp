@@ -1,0 +1,30 @@
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "8Pc-JD-VEG"; */
+"8Pc-JD-VEG.normalTitle" = "Button";
+
+/* Class = "UITextField"; placeholder = "Enter your number"; ObjectID = "Ief-6k-T4u"; */
+"Ief-6k-T4u.placeholder" = "Enter your number";
+
+/* Class = "UIButton"; normalTitle = "Log"; ObjectID = "M2r-L3-wj1"; */
+"M2r-L3-wj1.normalTitle" = "Log";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "WMR-DI-K8u"; */
+"WMR-DI-K8u.normalTitle" = "Button";
+
+/* Class = "UITextField"; placeholder = "Name e.g. : Kanta"; ObjectID = "c8A-es-ahv"; */
+"c8A-es-ahv.placeholder" = "Name e.g. : Kanta";
+
+/* Class = "UIButton"; normalTitle = "Account"; ObjectID = "flm-DL-xJ0"; */
+"flm-DL-xJ0.normalTitle" = "Account";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "hRQ-LN-q80"; */
+"hRQ-LN-q80.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "kMO-os-OOQ"; */
+"kMO-os-OOQ.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "Button"; ObjectID = "kxa-0l-CF3"; */
+"kxa-0l-CF3.normalTitle" = "Button";
+
+/* Class = "UIButton"; normalTitle = "Delete Account"; ObjectID = "qlL-Vw-Ep6"; */
+"qlL-Vw-Ep6.normalTitle" = "Delete Account";
