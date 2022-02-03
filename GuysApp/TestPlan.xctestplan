@@ -1,0 +1,19 @@
+{
+  "configurations" : [
+    {
+      "id" : "4AC1BE1F-5BCE-4AE4-9905-8CD0EB0EDBBF",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true,
+    "threadSanitizerEnabled" : true
+  },
+  "testTargets" : [
+
+  ],
+  "version" : 1
+}
