@@ -1,0 +1,10 @@
+prefix=/Users/sarfokantankafrimpong/Desktop/gloox-1.24.framework/gloox-1.0.24/build
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: gloox
+Description: A high-level XMPP/Jabber library for C++
+Version: 1.0.24
+Libs: -L${libdir} -lgloox -lresolv -lresolv   -lssl -lcrypto -lz
+Cflags: -I${includedir}  -D_THREAD_SAFE 
