@@ -427,17 +427,17 @@ inline void XmppEgine::handleItemUnsubscribed( const gloox::JID& jid ){
 inline void XmppEgine::handleRoster( const gloox::Roster& roster ){
     if(!clientIsconnected())
         return;
-    std::thread([this,roster]{
-        m_lastActivityManager->resetIdleTimer();
-            for(auto ros:roster){
-                if(!m_clientConnected)
-                    return;
-                  m_lastActivityManager->query(gloox::JID(ros.first));
-                  std::this_thread::sleep_for(std::chrono::milliseconds(100));
-                
-            }
-    }).detach();
-    
+//    std::thread([this,roster]{
+//        m_lastActivityManager->resetIdleTimer();
+//            for(auto ros:roster){
+//                if(!m_clientConnected)
+//                    return;
+//                  m_lastActivityManager->query(gloox::JID(ros.first));
+//                  std::this_thread::sleep_for(std::chrono::milliseconds(100));
+//                
+//            }
+//    }).detach();
+//    
 
         
     

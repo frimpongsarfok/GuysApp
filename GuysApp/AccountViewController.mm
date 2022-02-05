@@ -70,7 +70,6 @@
     [m_usrDP addSubview:m_indicator];
     //[m_bigImage setBackgroundColor:[UIColor colorWithRed:1 green:0 blue:.65 alpha:1]];
 
- 
     tmpViewController=[[UIViewController alloc]init];
     
     m_appDelegate=(AppDelegate*)[[UIApplication sharedApplication]delegate];
@@ -127,31 +126,36 @@
 }
 - (IBAction)saveProfile:(id)sender {
     //self.view addSubview:
-    std::thread([self](const std::string fn,const std::string ln){
-        gloox::VCard *tmpVC=new gloox::VCard();
-        const std::string code=m_data->getUserInfo().extCODE;
-        const std::string token= m_data->getUserInfo().PUSH_ID;
-        tmpVC->setMailer(code);
-        tmpVC->setJabberid(m_xmppEngine->getMyJID().bare());
-        tmpVC->setUid(token);
-        tmpVC->setName(fn,ln);
+    if(!m_fname.text.length && !m_lname.text.length){
         
-      
+    }else{
+        std::thread([self](const std::string fn,const std::string ln){
+            gloox::VCard *tmpVC=new gloox::VCard();
+            const std::string code=m_data->getUserInfo().extCODE;
+            const std::string token= m_data->getUserInfo().PUSH_ID;
+            tmpVC->setMailer(code);
+            tmpVC->setJabberid(m_xmppEngine->getMyJID().bare());
+            tmpVC->setUid(token);
+            tmpVC->setName(fn,ln);
+            
+          
+            
+            
+            tmpVC->setPhoto("image/jpeg",m_data->m_userInfo.PHOTO);
+            m_data->setAccount(m_xmppEngine->getMyJID().bare(),fn,ln
+                               ,m_data->m_userInfo.extCODE,m_data->m_userInfo.PHOTO,m_data->m_userInfo.PUSH_ID);
+            m_xmppEngine->storeVCard(tmpVC);
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self.navigationController popViewControllerAnimated:YES];
+            });
+            
+           
         
-        
-        tmpVC->setPhoto("image/jpeg",m_data->m_userInfo.PHOTO);
-        m_data->setAccount(m_xmppEngine->getMyJID().bare(),fn,ln
-                           ,m_data->m_userInfo.extCODE,m_data->m_userInfo.PHOTO,m_data->m_userInfo.PUSH_ID);
-        m_xmppEngine->storeVCard(tmpVC);
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self.navigationController popViewControllerAnimated:YES];
-        });
-        
+            
+        },m_fname.text.UTF8String,m_lname.text.UTF8String).detach();
        
-    
-        
-    },m_fname.text.UTF8String,m_lname.text.UTF8String).detach();
-   
+    }
+ 
 }
 
 -(void)doneViewAnimate{

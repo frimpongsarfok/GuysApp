@@ -21,7 +21,7 @@
         m_videoViewCon=[[MyAVPlayerViewController alloc]init];
         [m_videoViewCon.view setFrame:CGRectMake(0, -self.frame.size.height*.03, self.frame.size.width, self.frame.size.height*.8)];
         [m_videoViewCon.view setUserInteractionEnabled:NO];
-    
+        
         m_msgEvent=[[UILabel alloc]init];
         [m_msgEvent setTextColor:[UIColor darkGrayColor]];
         [m_msg setTextColor:[UIColor blackColor]];
@@ -219,6 +219,7 @@
         case AppData::MESSAGETYPE::FILE_URL:{
             m_fileUrl=txt;
             // NSString*extension= [m_fileUrl  pathExtension];
+            NSLog(@"383838383  %@",m_fileUrl);
             [m_downloadDelegate  downloadDownloadFile:m_selfIndex url:m_fileUrl msgID:m_msgID];
             [self addSubview:m_activityIndicator];
             [m_activityIndicator startAnimating];
@@ -290,12 +291,11 @@
                      break;
                  }
                  case PHAssetMediaTypeVideo:{
-//                     [m_videoViewCon.view setTranslatesAutoresizingMaskIntoConstraints:NO];
-//
-//                     [[[m_videoViewCon.view  topAnchor]constraintEqualToAnchor:self.topAnchor constant:-self.frame.size.height*.6] setActive:YES];
-//                     [[[m_videoViewCon.view  bottomAnchor]constraintEqualToAnchor:self.bottomAnchor constant:self.frame.size.height*.9] setActive:YES];
-//                     [[[m_videoViewCon.view leftAnchor]constraintEqualToAnchor:self.leftAnchor constant:-self.frame.size.width*.5] setActive:YES];
-//                     [[[m_videoViewCon.view  trailingAnchor] constraintEqualToAnchor:self.trailingAnchor constant:-self.frame.size.width*.5] setActive:YES];
+                     [m_videoViewCon.view setTranslatesAutoresizingMaskIntoConstraints:NO];
+                       [[[m_videoViewCon.view  topAnchor]constraintEqualToAnchor:self.topAnchor constant:0] setActive:YES];
+                      [[[m_videoViewCon.view  bottomAnchor]constraintEqualToAnchor:self.bottomAnchor constant:0] setActive:YES];
+                      [[[m_videoViewCon.view leadingAnchor]constraintEqualToAnchor:self.leadingAnchor constant:0] setActive:YES];
+                      [[[m_videoViewCon.view  trailingAnchor] constraintEqualToAnchor:self.trailingAnchor constant:0] setActive:YES];
                      break;
                  }
                  case PHAssetMediaTypeAudio:{

@@ -46,17 +46,19 @@ static NSString * const reuseIdentifier = @"Cell";
            // chatState->setChatState(gloox::ChatStateComposing);
            // //std::cout<<"typing..."<<std::endl;
         }
-        m_composeTimeSec=5;
+        m_composeTimeSec=10;
         std::thread tmpThread([self,chatState](){ //init thread
             while(m_composeTimeSec){
                 std::this_thread::sleep_for(std::chrono::seconds(1));
                // //std::cout<<"waiting... :"<<m_composeTimeSec<<std::endl;
-                if(m_composeTimeSec==1){
+                if(m_composeTimeSec==5){
                         if(chatState){
                             chatState->setChatState(gloox::ChatStatePaused);
                             
                         }
                        // //std::cout<<"paused typing..."<<std::endl;
+                }else if(m_composeTimeSec==1){
+                    chatState->setChatState(gloox::ChatStateActive);
                 }
                 --m_composeTimeSec;
             }
@@ -68,7 +70,7 @@ static NSString * const reuseIdentifier = @"Cell";
         
     }
     
-    m_composeTimeSec=5;
+    m_composeTimeSec=10;
 
 }
 -(BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text{
@@ -284,8 +286,8 @@ static NSString * const reuseIdentifier = @"Cell";
         }else{
             m_isPartnerOnline=NO;
             if(part.lastTimeOnline.empty()){
-                self->m_xmppEngine->m_lastActivityManager->query(gloox::JID(m_appDelegate->m_toJid.UTF8String));
                 self->m_partnerPresenceBarItem.title=@"Offline";
+                self->m_xmppEngine->m_lastActivityManager->query(gloox::JID(m_appDelegate->m_toJid.UTF8String));
             }else{
                 self->m_partnerPresenceBarItem.title=[NSString stringWithUTF8String:part.lastTimeOnline.c_str()];
             }
