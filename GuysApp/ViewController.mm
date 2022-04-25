@@ -854,23 +854,23 @@
 	  [cell setAutoresizingMask:UIViewAutoresizingNone];
 	  auto ros=m_data->chatRoster();
 	  NSString *name=[NSString stringWithUTF8String:ros[indexPath.row].name.c_str()];;
-	  NSString *number=[NSString stringWithUTF8String:gloox::JID(ros[indexPath.row].jid).username().c_str()];;
+	 // NSString *number=[NSString stringWithUTF8String:gloox::JID(ros[indexPath.row].jid).username().c_str()];;
 	  cell->m_jid=ros[indexPath.row].jid;
 	  std::cout<<"%%%%% "<<ros[indexPath.row].name<<" : "<<ros[indexPath.row].jid<<std::endl;
-	  
-
-
-	  if([name isEqualToString:@""]){
-		  [cell->m_name setText:number];
-	  }else{
-		  [cell->m_name setText:name];
-	  }
+   
 	  if(m_data->isPartnerExisting(cell->m_jid).blocked){
-		 NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc] initWithString:cell->m_name.text];
+		 NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc] initWithString:name];
 		 [attributeString addAttribute:NSStrikethroughStyleAttributeName
-								 value:@2
+								 value:@3
 								 range:NSMakeRange(0, [attributeString length])];
 		 [cell->m_name setAttributedText:attributeString];
+	  }else{
+		
+		 [self->m_rosterTableView beginUpdates];
+			NSMutableAttributedString *originalMutableAttributedString =[[NSMutableAttributedString alloc] initWithString:name];
+			[originalMutableAttributedString removeAttribute:NSStrikethroughStyleAttributeName range:NSMakeRange(0, name.length)];
+			cell->m_name.attributedText=originalMutableAttributedString;
+		 [self->m_rosterTableView endUpdates];
 	  }
 	 
 	  m_deletePartnerGest=[[UILongPressGestureRecognizer alloc]initWithTarget:self action:@selector(handleDeletePartner:)];
@@ -2183,17 +2183,16 @@ if(curNumbOfPart!=prevNum){
 			if(!item.action()){
 			   NSLog(@"handlePrivacyLis99ee9 %s\t%i",item.value().c_str(),item.action());
 			   [self->m_rosterTableView beginUpdates];
-			   NSMutableAttributedString *originalMutableAttributedString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithUTF8String:tmpPart.name.c_str()]];;
-			   NSRange originalRange = NSMakeRange(0, originalMutableAttributedString.length);
-			   [originalMutableAttributedString setAttributes:@{} range:originalRange];
-			   [tmpCell->m_name setAttributedText:originalMutableAttributedString];
+			   NSMutableAttributedString *originalMutableAttributedString =[[NSMutableAttributedString alloc] initWithAttributedString:tmpCell->m_name.attributedText];
+			   [originalMutableAttributedString removeAttribute:NSStrikethroughStyleAttributeName range:NSMakeRange(0, tmpCell->m_name.attributedText.length)];
+			   tmpCell->m_name.attributedText=originalMutableAttributedString;
 			   [self->m_rosterTableView endUpdates];
 			}else{
-			  
+			   
 			   [self->m_rosterTableView beginUpdates];
 			   NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithUTF8String:tmpPart.name.c_str()]];
 			   [attributeString addAttribute:NSStrikethroughStyleAttributeName
-									   value:@2
+									   value:@3
 									   range:NSMakeRange(0, [attributeString length])];
 			   [tmpCell->m_name setAttributedText:attributeString];
 			   [self->m_rosterTableView endUpdates];

@@ -1025,8 +1025,9 @@ void XmppEgine::handleBytestreamClose( gloox::Bytestream* bs )
 }
 void    XmppEgine::handlePrivacyListNames (const std::string &active, const std::string &def, const gloox::StringList &lists){
     dispatch_sync(dispatch_get_main_queue(), ^{
-    if(m_delegate)
-       [m_delegate handlePrivacyListNames:active def:def privacyList:lists];
+        if(m_delegate){
+            [m_delegate handlePrivacyListNames:active def:def privacyList:lists];
+        }
     });
 }
 
