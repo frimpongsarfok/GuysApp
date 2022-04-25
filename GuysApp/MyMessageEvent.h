@@ -93,7 +93,7 @@ public:
             }
             
         }/*else if(!body.empty()&& from==m_handler->getMyJID().full()){
-          //std::cout<<"log tag\n\n\n\n"<<"\n"<<"\n\a"<<std::endl;
+          std::cout<<"log tag\n\n\n\n"<<"\n"<<"\n\a"<<std::endl;
           gloox::Message::MessageType type=gloox::Message::Error;
           gloox::JID _to(tag->findAttribute("to"));
           gloox::JID _from(from);

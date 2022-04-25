@@ -15,15 +15,15 @@ AppData::AppData():m_sql3(nullptr),m_dbName(std::string()),m_userInfo({}),m_part
     if(!m_fileStream.is_open()){
         sqlite3_config(SQLITE_CONFIG_SERIALIZED);
         if(sqlite3_open([_dbName UTF8String],& m_sql3)==SQLITE_OK){
-            //std::cout<<"db open successfuly :"<<m_dbName<<std::endl;
+            std::cout<<"db open successfuly :"<<m_dbName<<std::endl;
               createTables();
         }else{
-            //std::cout<<"fail to create db at :"<<m_dbName<<std::endl;
+            std::cout<<"fail to create db at :"<<m_dbName<<std::endl;
         }
     }else{
 sqlite3_config(SQLITE_CONFIG_SERIALIZED);
         if(sqlite3_open(m_dbName.c_str(), &m_sql3)!=SQLITE_OK){
-            //std::cout<<"fail to open db "<<m_dbName<<std::endl;
+            std::cout<<"fail to open db "<<m_dbName<<std::endl;
             return;
         }
         getUserInfo();
@@ -35,18 +35,18 @@ bool AppData::createTables(){
     try {
        
   
-        if( sqlite3_exec(m_sql3,"CREATE TABLE IF NOT EXISTS 'ACCOUNT'(JID TEXT,FNAME TEXT,LNAME TEXT ,CALLINGCODE VARCAR(10) ,PHOTO LONGBLOB,PUSH_ID TEXT);" // USER ACCOUNT // NOT CONSTRAINT BECAUSE  USER DEVICE CAN BE STORED BEFORE REGISTERED
-                                "CREATE TABLE IF NOT EXISTS 'PARTNERS' (JID TEXT PRIMARY_KEY NOT NULL,NAME TEXT,PHOTO LONGBLOB,REGISTERED BOOLEAN DEFAULT FALSE,INROSTER BOOLEAN DEFAULT FALSE,INCONTACT BOOLEAN DEFAULT FALSE,LASTTIMEONLINE DATETIME,CHAT_PRIORITY DATETIME DEFAULT CURRENT_TIMESTAMP,PUSH_ID TEXT);" // PARTNERS
+        if( sqlite3_exec(m_sql3,"CREATE TABLE IF NOT EXISTS 'ACCOUNT'(JID TEXT,FNAME TEXT,LNAME TEXT ,CALLINGCODE VARCAR(10) ,PHOTO LONGBLOB,PUSH_ID TEXT,PUBSUB_CREATED INT DEFAULT 0);" // USER ACCOUNT // NOT CONSTRAINT BECAUSE  USER DEVICE CAN BE STORED BEFORE REGISTERED
+                                "CREATE TABLE IF NOT EXISTS 'PARTNERS' (JID TEXT PRIMARY_KEY NOT NULL,NAME TEXT,PHOTO LONGBLOB,REGISTERED BOOLEAN DEFAULT FALSE,INROSTER BOOLEAN DEFAULT FALSE,INCONTACT BOOLEAN DEFAULT FALSE,LASTTIMEONLINE DATETIME,CHAT_PRIORITY DATETIME DEFAULT CURRENT_TIMESTAMP,PUSH_ID TEXT,PUBSUB_NOTI TEXT,BLOCKED INT DEFAULT 0);" // PARTNERS
                                 "CREATE TABLE IF NOT EXISTS 'CHATS' (ID INT PRIMARY_KEY,_FROM TEXT NOT NULL,_TO TEXT NOT NULL,MESSAGE TEXT NOT NULL,DATENTIME DATETIME DEFAULT CURRENT_TIMESTAMP,MSG_EVENT_TYPE INT DEFAULT -1,MSG_ID TEXT NOT NULL,FILE BLOB DEFAULT '',TYPE INT);"
                                 "CREATE VIEW PARTNERS_JID_VIEW AS SELECT JID FROM PARTNERS;" // VIEW FOR QUERING PARTNERS NUMBER
                                 "CREATE TABLE IF NOT EXISTS 'FILE_URL_MSG_INFO' (MSG_ID TEXT ,URL TEXT, FOREIGN KEY (MSG_ID) REFERENCES CHATS(MSG_ID));"
                          ,0, 0,&err)!=SQLITE_OK){
             throw false;
         }else{
-            //std::cout<<"tables created successfuly in : "<<m_dbName<<std::endl;
+            std::cout<<"tables created successfuly in : "<<m_dbName<<std::endl;
         }
     } catch (bool e) {
-        //std::cout<<"fail to create tables err : "<<err<<std::endl;
+        std::cout<<"fail to create tables err : "<<err<<std::endl;
         return false;
     }
 
@@ -66,6 +66,45 @@ AppData::PartnersType AppData::registered(){
     }
     return tmp;
 }
+//void  AppData::setPubSubCreated(bool created){
+//
+//
+//    sqlite3_stmt *stmt;
+//    int rc=sqlite3_prepare_v2(m_sql3, "UPDATE ACCOUNT SET PUBSUB_CREATED=?", -1, &stmt, 0);
+//    sqlite3_bind_int(stmt, 1, (int)created);
+//    if(rc==SQLITE_OK){
+//        int step=sqlite3_step(stmt);
+//        if(step!=SQLITE_DONE){
+//            std::cout<<"fail to execute partner stmt"<<std::endl;
+//            sqlite3_finalize(stmt);
+//            return;
+//        }else{
+//            std::cout<<" ACCOUNT 'PUBSUB_CREATED' updated"<<std::endl;
+//            sqlite3_finalize(stmt);
+//        }
+//    }else{
+//        std::cout<<"fail to update ACCOUNT PUBSUB_CREATED"<<std::endl;
+//
+//    }
+//}
+//bool AppData::isPubSubCreated(){
+//     bool isCreated=false;
+//
+//
+//    sqlite3_stmt *stmt;
+//
+//    if(sqlite3_prepare(m_sql3, "SELECT PUBSUB_CREATED FROM ACOUNT", -1, &stmt, 0)==SQLITE_OK){
+//        int step=sqlite3_step(stmt);
+//        if(step==SQLITE_ROW){
+//            isCreated=(bool)sqlite3_column_int(stmt, 0);
+//        }
+//    }else{
+//        std::cout<<"file url preparation stmt fail"<<std::endl;
+//        return isCreated;
+//    }
+//    sqlite3_finalize(stmt);
+//    return isCreated;
+//}
 void AppData::saveDownloadFileID(const std::string msgID,const std::string fileID){
     
     if(!msgID.size() && !fileID.size())
@@ -79,16 +118,16 @@ void AppData::saveDownloadFileID(const std::string msgID,const std::string fileI
     if(rc==SQLITE_OK){
         int step=sqlite3_step(stmt);
         if(step!=SQLITE_DONE){
-            //std::cout<<"fail to prepare saveDownloadFile  stmt"<<std::endl;
+            std::cout<<"fail to prepare saveDownloadFile  stmt"<<std::endl;
             sqlite3_finalize(stmt);
             
             return;
         }else{
-            //std::cout<<" file save"<<std::endl;
+            std::cout<<" file save"<<std::endl;
             sqlite3_finalize(stmt);
         }
     }else{
-        //std::cout<<"fail to prepare partner stmt for update"<<std::endl;
+        std::cout<<"fail to prepare partner stmt for update"<<std::endl;
         
     }
     
@@ -107,9 +146,11 @@ AppData::PartnerInfoType AppData::isPartnerExisting(std::string jid){
 }
 
 void AppData::setPartnerPhoto(std::string jid,std::string photo){
-    if(!jid.size() && !photo.size())
-        return ;
- 
+    if(jid.size()&& m_partners.find(jid)!= m_partners.end()){
+        m_partners.find(jid)->second.photo=photo;
+    }else{
+        return;
+    }
     sqlite3_stmt *stmt;
     int rc=sqlite3_prepare_v2(m_sql3, "UPDATE PARTNERS SET PHOTO=? WHERE JID=?", -1, &stmt, 0);
     sqlite3_bind_blob(stmt, 1, photo.c_str(), (int)strlen(photo.c_str()), 0);
@@ -118,31 +159,68 @@ void AppData::setPartnerPhoto(std::string jid,std::string photo){
     if(rc==SQLITE_OK){
         int step=sqlite3_step(stmt);
         if(step!=SQLITE_DONE){
-            //std::cout<<"fail to execute partner stmt"<<std::endl;
+            std::cout<<"fail to execute partner stmt"<<std::endl;
             sqlite3_finalize(stmt);
             
             return;
         }else{
-            //std::cout<<" partner 'Photo' updated"<<std::endl;
+            std::cout<<" partner 'Photo' updated"<<std::endl;
             sqlite3_finalize(stmt);
         }
     }else{
-        //std::cout<<"fail to prepare partner stmt for update"<<std::endl;
+        std::cout<<"fail to prepare partner stmt for update"<<std::endl;
         
     }
  
      
-    m_partners.find(jid)->second.photo=photo;
+  
   
 
 }
+void AppData::setPubSubNotification(std::string jid,std::string node){
 
-void AppData::setPartnerRegistered(const std::string jid, bool registered){
-    if(!jid.size())
+    if(jid.size()&& m_partners.find(jid)!= m_partners.end()){
+     
+        m_partners.find(jid)->second.noti_pubsub_node=node;
+    }else{
         return;
-  
+    }
+ 
+    sqlite3_stmt *stmt;
+    int rc=sqlite3_prepare_v2(m_sql3, "UPDATE PARTNERS SET PUBSUB_NOTI=? WHERE JID=?", -1, &stmt, 0);
+    sqlite3_bind_blob(stmt, 1, node.c_str(), (int)strlen(node.c_str()), 0);
+    sqlite3_bind_text(stmt, 2, jid.c_str(), (int)strlen(jid.c_str()), 0);
     
+    if(rc==SQLITE_OK){
+        int step=sqlite3_step(stmt);
+        if(step!=SQLITE_DONE){
+            std::cout<<"fail to execute partner stmt"<<std::endl;
+            sqlite3_finalize(stmt);
+            
+            return;
+        }else{
+            std::cout<<" partner partner pubsub notification node updated"<<std::endl;
+            sqlite3_finalize(stmt);
+        }
+    }else{
+        std::cout<<"fail to prepare partner stmt for update"<<std::endl;
+        
+    }
+ 
+     
+   
+  
 
+}
+void AppData::setPartnerRegistered(const std::string jid, bool registered){
+    
+    
+    if(jid.size()&& m_partners.find(jid)!= m_partners.end()){
+     
+        m_partners.find(jid)->second.registered=registered;
+    }else{
+        return;
+    }
             sqlite3_stmt *stmt;
             int rc=sqlite3_prepare_v2(m_sql3, "UPDATE PARTNERS SET REGISTERED=? WHERE JID=?", -1, &stmt, 0);
             sqlite3_bind_int(stmt, 1, registered);
@@ -151,11 +229,11 @@ void AppData::setPartnerRegistered(const std::string jid, bool registered){
             if(rc==SQLITE_OK){
                 int step=sqlite3_step(stmt);
                 if(step!=SQLITE_DONE){
-                    //std::cout<<"fail to execute partner 'isRegistered' stmt"<<std::endl;
+                    std::cout<<"fail to execute partner 'isRegistered' stmt"<<std::endl;
                     
                     return ;
                 }else{
-                    //std::cout<<" partner 'isRegistered' updated"<<std::endl;
+                    std::cout<<" partner 'isRegistered' updated"<<std::endl;
                    
                     sqlite3_finalize(stmt);
                     
@@ -163,19 +241,24 @@ void AppData::setPartnerRegistered(const std::string jid, bool registered){
                 }
                 
              }else{
-                //std::cout<<"fail to prepare partner registered stmt for update "<<std::endl;
+                std::cout<<"fail to prepare partner registered stmt for update "<<std::endl;
                  
                 return;
             
             }
     
-             m_partners.find(jid)->second.registered=registered;
+             
  
 }
 void AppData::setPartnerInContact(const std::string jid, bool inContact){
-    if(!jid.size())
-        return;
+   
  
+    if(jid.size()&& m_partners.find(jid)!= m_partners.end()){
+     
+        m_partners.find(jid)->second.inContact=inContact;
+    }else{
+        return;
+    }
     sqlite3_stmt *stmt;
     int rc=sqlite3_prepare_v2(m_sql3, "UPDATE PARTNERS SET INCONTACT=? WHERE JID=?", -1, &stmt, 0);
     sqlite3_bind_int(stmt, 1, inContact);
@@ -184,11 +267,11 @@ void AppData::setPartnerInContact(const std::string jid, bool inContact){
     if(rc==SQLITE_OK){
         int step=sqlite3_step(stmt);
         if(step!=SQLITE_DONE){
-            //std::cout<<"fail to execute partner 'inContact' stmt"<<std::endl;
+            std::cout<<"fail to execute partner 'inContact' stmt"<<std::endl;
             
             return ;
         }else{
-            //std::cout<<" partner 'inContact' updated"<<std::endl;
+            std::cout<<" partner 'inContact' updated"<<std::endl;
             
             sqlite3_finalize(stmt);
             
@@ -197,14 +280,13 @@ void AppData::setPartnerInContact(const std::string jid, bool inContact){
         }
         
     }else{
-        //std::cout<<"fail to prepare partner incontact stmt for update "<<std::endl;
+        std::cout<<"fail to prepare partner incontact stmt for update "<<std::endl;
         
         return;
         
     }
     
    
-    m_partners.find(jid)->second.inContact=inContact;
   
     
 //});
@@ -225,11 +307,11 @@ void AppData::setPartnerChatPriority(const std::string jid){
     if(rc==SQLITE_OK){
         int step=sqlite3_step(stmt);
         if(step!=SQLITE_DONE){
-            //std::cout<<"fail to execute partner 'setPartnerChatPriority' stmt"<<std::endl;
+            std::cout<<"fail to execute partner 'setPartnerChatPriority' stmt"<<std::endl;
             
             return ;
         }else{
-            //std::cout<<" partner priority updated \t"<<cc<<std::endl;
+            std::cout<<" partner priority updated \t"<<cc<<std::endl;
             
             sqlite3_finalize(stmt);
             
@@ -237,7 +319,7 @@ void AppData::setPartnerChatPriority(const std::string jid){
         }
         
     }else{
-        //std::cout<<"fail to prepare partner setPartnerChatPriority'stmt for update "<<std::endl;
+        std::cout<<"fail to prepare partner setPartnerChatPriority'stmt for update "<<std::endl;
         
         return;
         
@@ -258,7 +340,7 @@ void AppData::setPartnerInRoster(const std::string jid, bool inRoster){
         sqlite3_bind_text(stmt, 2, jid.c_str(),(int)jid.size(), 0);
         int step=sqlite3_step(stmt);
         if(step!=SQLITE_DONE){
-            //std::cout<<"fail to execute partner 'inRoster' stmt "<<step<<std::endl;
+            std::cout<<"fail to execute partner 'inRoster' stmt "<<step<<std::endl;
             sqlite3_finalize(stmt);
             return ;
         }else{
@@ -268,7 +350,7 @@ void AppData::setPartnerInRoster(const std::string jid, bool inRoster){
             m_partners.find(jid)->second.inroster=inRoster;
     
        
-            //std::cout<<" partner 'inRoster' updated"<<std::endl;
+            std::cout<<" partner 'inRoster' updated"<<std::endl;
            
        
       
@@ -276,7 +358,7 @@ void AppData::setPartnerInRoster(const std::string jid, bool inRoster){
       
         
     }else{
-        //std::cout<<"fail to prepare partner roster stmt for update "<<std::endl;
+        std::cout<<"fail to prepare partner roster stmt for update "<<std::endl;
         
         return;
         
@@ -298,14 +380,14 @@ void AppData::setPartnerPushID(const std::string jid, std::string pushID){
         sqlite3_bind_text(stmt, 2, jid.c_str(),(int)jid.size(), 0);
         int step=sqlite3_step(stmt);
         if(step!=SQLITE_DONE){
-            //std::cout<<"fail to execute partner 'pushid' stmt "<<step<<std::endl;
+            std::cout<<"fail to execute partner 'pushid' stmt "<<step<<std::endl;
             sqlite3_finalize(stmt);
             return ;
         }else{
              sqlite3_finalize(stmt);
             //m_rosterSorted=false;
             m_partners.find(jid)->second.pushID=pushID;
-            //std::cout<<" partner 'pushid' updated"<<std::endl;
+            std::cout<<" partner 'pushid' updated"<<std::endl;
            
        
       
@@ -313,7 +395,7 @@ void AppData::setPartnerPushID(const std::string jid, std::string pushID){
       
         
     }else{
-        //std::cout<<"fail to prepare partner roster stmt for update "<<std::endl;
+        std::cout<<"fail to prepare partner roster stmt for update "<<std::endl;
         
         return;
         
@@ -333,12 +415,12 @@ void AppData::updatePartnerName(const std::string jid, const std::string name){
         sqlite3_bind_text(stmt, 2, jid.c_str(), (int)strlen(jid.c_str()), 0);
         int step=sqlite3_step(stmt);
         if(step!=SQLITE_DONE){
-            //std::cout<<"fail to execute partner 'updateName' stmt "<<step<<std::endl;
+            std::cout<<"fail to execute partner 'updateName' stmt "<<step<<std::endl;
             sqlite3_finalize(stmt);
             
             return ;
         }else{
-            //std::cout<<" partner 'Name' updated"<<std::endl;
+            std::cout<<" partner 'Name' updated"<<std::endl;
             sqlite3_finalize(stmt);
             
             
@@ -347,7 +429,7 @@ void AppData::updatePartnerName(const std::string jid, const std::string name){
         
         
     }else{
-        //std::cout<<"fail to prepare 'updatePartnerName' stmt for update "<<std::endl;
+        std::cout<<"fail to prepare 'updatePartnerName' stmt for update "<<std::endl;
         
         return;
         
@@ -364,13 +446,13 @@ void AppData::deletePartner(const std::string jid){
     
     sqlite3_exec(m_sql3, ("DELETE FROM CHATS WHERE _TO='"+jid+"'"+" OR _FROM='"+jid+"'").c_str(), nullptr, nullptr, &err);
     if(err ){
-        //std::cout<<"fail to delete partners  chat:"<<err<<std::endl;
+        std::cout<<"fail to delete partners  chat:"<<err<<std::endl;
     }
     if(err)
         sqlite3_free(err);
     sqlite3_exec(m_sql3, ("DELETE FROM PARTNERS WHERE JID='"+jid+"'").c_str(), nullptr, nullptr, &err);
     if(err ){
-        //std::cout<<"fail to delete partners :"<<err<<std::endl;
+        std::cout<<"fail to delete partners :"<<err<<std::endl;
         
     }
     if(err)
@@ -396,11 +478,11 @@ void AppData::setPartnerLastTimeOnline(const std::string jid, const std::string&
         int step=sqlite3_step(stmt);
         sqlite3_finalize(stmt);
         if(step!=SQLITE_DONE){
-            //std::cout<<"fail to execute partner 'lastTimeOnline' stmt"<<std::endl;
+            std::cout<<"fail to execute partner 'lastTimeOnline' stmt"<<std::endl;
             
             return ;
         }else{
-            //std::cout<<" partner 'lastTimeOnline' updated"<<std::endl;
+            std::cout<<" partner 'lastTimeOnline' updated"<<std::endl;
             
             
             sqlite3_finalize(stmt);
@@ -410,7 +492,7 @@ void AppData::setPartnerLastTimeOnline(const std::string jid, const std::string&
         }
         
     }else{
-        //std::cout<<"fail to prepare partner lasttimeonline stmt for update "<<std::endl;
+        std::cout<<"fail to prepare partner lasttimeonline stmt for update "<<std::endl;
         
         return;
         
@@ -445,18 +527,18 @@ void AppData::addPartner(const PartnerInfoType& partner){
         if(rc==SQLITE_OK){
             int step=sqlite3_step(stmt);
             if(step!=SQLITE_DONE){
-                //std::cout<<"Fail to execute add partner  stmt"<<std::endl;
+                std::cout<<"Fail to execute add partner  stmt"<<std::endl;
                 return ;
             }else{
                  sqlite3_finalize(stmt);
               
                 m_partners.insert({partner.jid,partner});
     
-                //std::cout<<"added \t"<<partner.jid<<" "<<partner.name<<std::endl;
+                std::cout<<"added \t"<<partner.jid<<" "<<partner.name<<std::endl;
               
             }
     }else{
-            //std::cout<<"fail to prepare add partner stmt to store "<<rc<<"\t"<<partner.jid<<"\t"<<partner.name<<std::endl;
+            std::cout<<"fail to prepare add partner stmt to store "<<rc<<"\t"<<partner.jid<<"\t"<<partner.name<<std::endl;
         
         
 
@@ -486,15 +568,15 @@ void AppData::setFileURLInfo(std::string _id, std::string url){
     if(rc==SQLITE_OK){
         int step=sqlite3_step(stmt);
         if(step!=SQLITE_DONE){
-            //std::cout<<"Fail to execute add partner  stmt"<<std::endl;
+            std::cout<<"Fail to execute add partner  stmt"<<std::endl;
             return ;
         }else{
             sqlite3_finalize(stmt);
      
-            //std::cout<<"saved url: \t"<<_id<<"\t"<<url<<std::endl;
+            std::cout<<"saved url: \t"<<_id<<"\t"<<url<<std::endl;
         }
     }else{
-        //std::cout<<"fail to prepare file url statement "<<std::endl;
+        std::cout<<"fail to prepare file url statement "<<std::endl;
         
         
         
@@ -516,7 +598,7 @@ const std::string AppData::getFileURLInfo(const std::string _id){
     
         }
     }else{
-        //std::cout<<"file url preparation stmt fail"<<std::endl;
+        std::cout<<"file url preparation stmt fail"<<std::endl;
         return url;
     }
     sqlite3_finalize(stmt);
@@ -527,7 +609,7 @@ bool AppData::deletePartnerFromChat(const std::string jid){
 
         sqlite3_exec(m_sql3, ("DELETE FROM CHATS WHERE _TO='"+jid+"'"+" OR _FROM='"+jid+"'").c_str(), nullptr, nullptr, &err);
         if(err ){
-            //std::cout<<"fail to delete partners :"<<err<<std::endl;
+            std::cout<<"fail to delete partners :"<<err<<std::endl;
             
             if(err)
               sqlite3_free(err);
@@ -535,7 +617,7 @@ bool AppData::deletePartnerFromChat(const std::string jid){
         }
 
 
-    
+    m_chatData.erase(jid);
     return true;
 }
 AppData::PartnersMapType  AppData::getPartners(){
@@ -552,8 +634,8 @@ AppData::PartnersMapType  AppData::getPartners(){
                     std::string jid=std::string((char*)sqlite3_column_text(stmt, 0));
                      std::string name=std::string((char*)sqlite3_column_text(stmt, 1));
                     
-                    std::string photo,lastTimeOnline,chatPriority,pushID;
-                    photo=lastTimeOnline=chatPriority=pushID={};
+                    std::string photo,lastTimeOnline,chatPriority,pushID,noti_pubsub_node;
+                    noti_pubsub_node=photo=lastTimeOnline=chatPriority=pushID={};
                     if(sqlite3_column_bytes(stmt, 2))
                         photo=(char*)sqlite3_column_blob(stmt, 2);
                     else
@@ -570,14 +652,17 @@ AppData::PartnersMapType  AppData::getPartners(){
                         pushID=(char*)sqlite3_column_text(stmt, 8);
                       
                     }
-                   
-                    m_partners.insert({jid,{jid,name,photo,registered,inRoster,inContact,lastTimeOnline,chatPriority,gloox::Presence::Unavailable ,pushID}});
+                    if(sqlite3_column_bytes(stmt, 9)){
+                        noti_pubsub_node=(char*)sqlite3_column_text(stmt, 9);
+                    }
+                    bool blocked=sqlite3_column_int(stmt, 10);
+                    m_partners.insert({jid,{jid,(name.empty()?gloox::JID(jid).username():name),photo,registered,inRoster,inContact,lastTimeOnline,chatPriority,gloox::Presence::Unavailable ,pushID,noti_pubsub_node,blocked}});
                
                    
                 }
                 
             }else{
-                //std::cout<<"fail to get all partners  "<<std::endl;
+                std::cout<<"fail to get all partners  "<<std::endl;
                 sqlite3_finalize(stmt);
                 
                 
@@ -595,10 +680,51 @@ AppData::PartnersMapType  AppData::getPartners(){
     
 }
 
+
+void AppData::setBlockPartner(const std::string jid,bool toggle){
+    if(jid.size()&& m_partners.find(jid)!= m_partners.end()){
+        m_partners.find(jid)->second.blocked=toggle;
+    }else{
+        return;
+    }
+    sqlite3_stmt *stmt;
+    int rc=sqlite3_prepare_v2(m_sql3, "UPDATE PARTNERS SET BLOCKED=? WHERE JID=?", -1, &stmt, 0);
+    sqlite3_bind_int(stmt, 1, toggle);
+    sqlite3_bind_text(stmt, 2, jid.c_str(), (int)strlen(jid.c_str()), 0);
+    
+    if(rc==SQLITE_OK){
+        int step=sqlite3_step(stmt);
+        if(step!=SQLITE_DONE){
+            std::cout<<"fail to execute setBlockPartner stmt"<<std::endl;
+            sqlite3_finalize(stmt);
+            
+            return;
+        }else{
+            std::cout<<" partner  ("<< jid <<") "<<(toggle?"blocked":"unblocked")<<std::endl;
+            sqlite3_finalize(stmt);
+        }
+    }else{
+        std::cout<<"fail to prepare partner stmt for update"<<std::endl;
+        
+    }
+ 
+    
+}
+AppData::PartnersType AppData::getPartnerBlockList(){
+    PartnersType list;
+    for(auto part:getPartners()){
+        if(part.second.blocked)list.push_back(part.second);
+    }
+    return  list;
+
+    
+}
 AppData::PartnersType AppData::contact(std::string searchKey){
-   
+    if(m_partners.empty()){
+        getPartners();
+    }
     PartnersType tmp{};
-   
+    
     if(searchKey.size()){
         for (auto & part : m_partners ) {
             
@@ -653,7 +779,7 @@ AppData::PartnersType  AppData::chatRoster(){
     for(auto jid:m_chatData){
         if(!jid.second.empty()){
             auto part=isPartnerExisting(jid.first);
-           ////std::cout<<" chat roster order "<<part.jid<<" "<<part.lastTimeOnline<<std::endl;
+           //std::cout<<" chat roster order "<<part.jid<<" "<<part.lastTimeOnline<<std::endl;
             tmp.push_back(part);
         }
     }
@@ -707,7 +833,7 @@ AppData::PartnersType  AppData::roster(){
     }else{
       
     }
-     //std::cout<<"message inserted "<<to<<" \t "<<from<< "\t"<<cc<<std::endl;
+     std::cout<<"message inserted "<<to<<" \t "<<from<< "\t"<<cc<<std::endl;
     sqlite3_stmt *stmt;
     if(sqlite3_prepare(m_sql3,"SELECT LAST_INSERT_ROWID();", -1, &stmt,0)!=SQLITE_OK){
         std::cout<<"fail to select last insert_row id"<<std::endl;
@@ -768,7 +894,7 @@ void AppData::getChatData(){
         //SELECT ID,_FROM,_TO,MESSAGE,DATENTIME,MSG_EVENT_TYPE,MSG_ID,TYPE FROM CHATS WHERE (_FROM='"+roster.jid+"' AND _TO='"+myJID+"') OR (_FROM='"+myJID+"' AND _TO='"+roster.jid+"')
         if(sqlite3_prepare_v2(m_sql3, "SELECT DISTINCT ID,_FROM,_TO,MESSAGE,DATENTIME,MSG_EVENT_TYPE,MSG_ID,TYPE FROM CHATS INNER JOIN PARTNERS ON PARTNERS.JID=CHATS._FROM OR PARTNERS.JID=CHATS._TO ORDER BY CHAT_PRIORITY"
                                       " ;", -1, &stmt, 0)!=SQLITE_OK){
-            //std::cout<<"fail to prepare chat stmt : "<<sqlite3_errmsg(m_sql3)<<std::endl;
+            std::cout<<"fail to prepare chat stmt : "<<sqlite3_errmsg(m_sql3)<<std::endl;
             return;
         }
 //        sqlite3_bind_text(stmt, 1, roster.jid.c_str(), (int)strlen(roster.jid.c_str()), 0);
@@ -792,7 +918,7 @@ void AppData::getChatData(){
             std::string jid=from.UTF8String==myJID?to.UTF8String:from.UTF8String;
             auto partChat=m_chatData.find(jid);
             //NSLog(@"FROM :%@ TO :%@ DATENTIME :%@ MSG_ID :%@",from,to,date,msg_ID);
-            ////std::cout<<"mmdmdmdmdmdmdmdmdmdd"<<std::endl;
+            //std::cout<<"mmdmdmdmdmdmdmdmdmdd"<<std::endl;
             if(partChat==m_chatData.end()){
                 std::vector<ChatInfo> tmpChat={};
                 tmpChat.push_back(info);
@@ -835,7 +961,7 @@ bool AppData::setAccount(const std::string jid,const std::string fname, const st
     m_userInfo.PUSH_ID=token;
       
 
-    dropUserData();
+    dropUserData(false);
     //"INSERT INTO ACCOUNT(JID,FNAME,LNAME,CALLINGCODE,PHOTO,PUSH_ID) VALUES( '"+jid+"','"+fname+"','"+lname+"','"+callingCode+"','"+photo+"','"+token+"')"
     sqlite3_stmt *stmt;
    auto rc=sqlite3_prepare_v2(m_sql3,"INSERT INTO ACCOUNT(JID,FNAME,LNAME,CALLINGCODE,PHOTO,PUSH_ID) VALUES( ?,?,?,?,?,?);", -1, &stmt, 0);
@@ -854,12 +980,12 @@ bool AppData::setAccount(const std::string jid,const std::string fname, const st
                
             }else{
                 sqlite3_finalize(stmt);
-            //std::cout<<"fail to store info err:"<<err<<std::endl;
+            std::cout<<"fail to store info err:"<<err<<std::endl;
                 return false;
            
             }
         }
-         //std::cout<<"info saved" <<std::endl;
+         std::cout<<"info saved" <<std::endl;
    
 
    
@@ -907,7 +1033,7 @@ const AppData::AccountInfo AppData::getUserInfo(){
          }
      }else{
         
-          //std::cout<<"info preparation fail"<<std::endl;
+          std::cout<<"info preparation fail"<<std::endl;
          return m_userInfo;
      }
     
@@ -918,21 +1044,28 @@ const AppData::AccountInfo AppData::getUserInfo(){
     return m_userInfo;
 }
 
-bool AppData::dropUserData(){
+bool AppData::dropUserData(BOOL allData){
   
    
     char* err=nullptr;
    
-    if(sqlite3_exec(m_sql3, "DELETE FROM ACCOUNT", 0, 0, &err)!=SQLITE_OK){
-        //std::cout<<"fail to delete info err:"<<err<<std::endl;
- 
-        
-     
+   
+  
+    if(allData){
+        if(sqlite3_exec(m_sql3, "DELETE FROM PARTNERS; DELETE FROM CHATS;DELETE FROM FILE_URL_MSG_INFO;", 0, 0, &err)!=SQLITE_OK){
+            std::cout<<"fail to delete info err:"<<err<<std::endl;
+            return false;
+        }
+        m_chatData.clear();
+        m_partners.clear();
+    }
+   
+    if(sqlite3_exec(m_sql3, "DELETE FROM ACCOUNT;", 0, 0, &err)!=SQLITE_OK){
+        std::cout<<"fail to delete info err:"<<err<<std::endl;
         return false;
     }
-    
-
-    //std::cout<<"data deleted"<<std::endl;
+    m_userInfo={};
+    std::cout<<"data deleted"<<std::endl;
     return true;
     
 }
@@ -942,12 +1075,12 @@ bool AppData::setDeviceToken(std::string token){
         return false;
     char* err=nullptr;
     if(sqlite3_exec(m_sql3,( "UPDATE ACCOUNT SET PUSH_ID='"+token+"'").c_str(), 0, 0, &err)!=SQLITE_OK){
-        //std::cout<<"fail to update  push id err:"<<err<<std::endl;
+        std::cout<<"fail to update  push id err:"<<err<<std::endl;
         return false;
     }
     m_userInfo.PUSH_ID=token;
     
-    //std::cout<<"deveice token update"<<std::endl;
+    std::cout<<"deveice token update"<<std::endl;
     return true;
     
 }
@@ -960,7 +1093,7 @@ bool AppData::setMsgStatus(const std::string  bareJId,std::string _id,gloox::Mes
     if(toMe){
         if(status==gloox::MessageEventDisplayed){
             if(sqlite3_exec(m_sql3,( "UPDATE CHATS SET MSG_EVENT_TYPE="+std::to_string(gloox::MessageEventDisplayed)+" WHERE _FROM='"+bareJId+"' AND MSG_EVENT_TYPE ==-1").c_str(), 0, 0, &err)!=SQLITE_OK){
-                //std::cout<<"fail to sent msg event not send"<<err<<std::endl;
+                std::cout<<"fail to sent msg event not send"<<err<<std::endl;
                 
               
                 return false;
@@ -973,7 +1106,7 @@ bool AppData::setMsgStatus(const std::string  bareJId,std::string _id,gloox::Mes
     NSString *tmpID=[NSString stringWithUTF8String:_id.c_str()];
     if(status==gloox::MessageEventDisplayed){
         if(sqlite3_exec(m_sql3,( "UPDATE CHATS SET MSG_EVENT_TYPE="+std::to_string(gloox::MessageEventDisplayed)+" WHERE _TO='"+bareJId+"' AND MSG_EVENT_TYPE ==2").c_str(), 0, 0, &err)!=SQLITE_OK){
-            //std::cout<<"fail to sent msg event not send"<<err<<std::endl;
+            std::cout<<"fail to sent msg event not send"<<err<<std::endl;
             return false;
         }
         
@@ -984,11 +1117,11 @@ bool AppData::setMsgStatus(const std::string  bareJId,std::string _id,gloox::Mes
               
             }
         }
-         //std::cout<<"msg event changedss : "<<status<<std::endl;
+         std::cout<<"msg event changedss : "<<status<<std::endl;
         return true;
     }
     if(sqlite3_exec(m_sql3,( "UPDATE CHATS SET MSG_EVENT_TYPE="+std::to_string(status)+" WHERE (MSG_ID='"+_id+"' AND MSG_EVENT_TYPE >=16) OR  (MSG_ID='"+_id+"' AND "+std::to_string(status)+">MSG_EVENT_TYPE) ").c_str(), 0, 0, &err)!=SQLITE_OK){
-        //std::cout<<"fail to sent msg event not send"<<err<<std::endl;
+        std::cout<<"fail to sent msg event not send"<<err<<std::endl;
         return false;
     }
 
@@ -996,7 +1129,7 @@ bool AppData::setMsgStatus(const std::string  bareJId,std::string _id,gloox::Mes
     for (int n=(int)tmp.size()-1;n>-1;--n) {
         if( ([tmpID isEqualToString:tmp[n].msg_ID] && status>=16) || (  [tmpID isEqualToString:tmp[n].msg_ID]  && tmp[n].msg_event<status) ){
             tmp[n].msg_event=status;
-            //std::cout<<"msg event changed : "<<status<<std::endl;
+            std::cout<<"msg event changed : "<<status<<std::endl;
             break;
             
         }
@@ -1012,7 +1145,7 @@ std::vector<std::tuple<std::string/*id*/,std::string/*to*/,std::string/*message*
     sqlite3_stmt * stmt;
     std::string myJID=m_userInfo.JID.bare();;
         if(sqlite3_prepare(m_sql3,("SELECT MSG_ID,_TO,MESSAGE,TYPE FROM CHATS WHERE (MSG_EVENT_TYPE=-1 AND _FROM='"+myJID+"' AND _TO!='"+myJID+"') OR (MSG_EVENT_TYPE=32 AND _FROM='"+myJID+"' AND _TO!='"+myJID+"') ").c_str(), -1, &stmt, 0)!=SQLITE_OK){
-        //std::cout<<"fail to prepare chat stmt : "<<sqlite3_errmsg(m_sql3)<<std::endl;
+        std::cout<<"fail to prepare chat stmt : "<<sqlite3_errmsg(m_sql3)<<std::endl;
         
         return m_unsentMsg;
     }
@@ -1034,7 +1167,7 @@ std::vector<std::tuple<std::string/*id*/,std::string/*to*/,std::string/*message*
 void AppData::deleteMessage(const gloox::JID jid,const std::string _id){
     char *err;
     if(sqlite3_exec(m_sql3,( "UPDATE CHATS SET MESSAGE='message was deleted',TYPE=6 WHERE MSG_ID='"+_id+"'").c_str(), 0, 0, &err)!=SQLITE_OK){
-        //std::cout<<"fail to delete msg "<<err<<std::endl;
+        std::cout<<"fail to delete msg "<<err<<std::endl;
         return;
     }
    
@@ -1047,7 +1180,7 @@ void AppData::deleteMessage(const gloox::JID jid,const std::string _id){
         
     }
     
-     //std::cout<<"message was deleted successfully"<<std::endl;
+     std::cout<<"message was deleted successfully"<<std::endl;
 }
 
 void AppData::setPresence(gloox::JID jid,gloox::Presence::PresenceType type,std::string time){
@@ -1077,7 +1210,7 @@ int AppData::getUnreadMsgCount(gloox::JID jid){
     int total=0;
     std::string jids=jid.bare();
         if(sqlite3_prepare(m_sql3,("SELECT COUNT(MSG_EVENT_TYPE) FROM CHATS WHERE MSG_EVENT_TYPE=-1 AND _FROM='"+jids+"'").c_str(), -1, &stmt, 0)!=SQLITE_OK){
-            //std::cout<<"fail to prepare chat stmt : "<<sqlite3_errmsg(m_sql3)<<std::endl;
+            std::cout<<"fail to prepare chat stmt : "<<sqlite3_errmsg(m_sql3)<<std::endl;
             
             return total;
         }
@@ -1099,7 +1232,7 @@ std::pair<std::string/*from*/,std::string/*to*/> AppData::getToAndFrom4FileUrlSe
     if(msgID.empty())
         return {};
     if(sqlite3_prepare(m_sql3,("SELECT _FROM,_TO FROM CHATS WHERE MSG_ID='"+msgID+"';").c_str(), -1, &stmt, 0)!=SQLITE_OK){
-        //std::cout<<"fail to prepare chat stmt : "<<sqlite3_errmsg(m_sql3)<<std::endl;
+        std::cout<<"fail to prepare chat stmt : "<<sqlite3_errmsg(m_sql3)<<std::endl;
         
         return {};
     }

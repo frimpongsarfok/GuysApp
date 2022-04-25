@@ -21,7 +21,7 @@
     self->m_background=[[UILabel alloc] init];
     self->m_name=[[UILabel alloc]init];
     self->m_number=[[UILabel alloc]init];
-   self->m_invite=[[UILabel alloc]init];
+   
 
    
      self->m_background.translatesAutoresizingMaskIntoConstraints=NO;
@@ -29,14 +29,12 @@
     [self addSubview:m_background];
    [m_background addSubview:m_name];
    [m_background addSubview:m_number];
-   [m_background addSubview:m_invite];
-  
+   
    
    self->m_name.translatesAutoresizingMaskIntoConstraints=NO;
     self->m_number.translatesAutoresizingMaskIntoConstraints=NO;
    
-   self->m_invite.translatesAutoresizingMaskIntoConstraints=NO;
-  
+   
   
     //self->m_invite.numberOfLines=0;
    // [self->m_invite setTextAlignment:NSTextAlignmentLeft];
@@ -58,31 +56,19 @@
    [[m_number.leadingAnchor constraintEqualToAnchor:m_background.leadingAnchor constant:10] setActive:YES];
    
  
-   [[self->m_invite.bottomAnchor constraintEqualToAnchor:self->m_background.bottomAnchor constant:-10] setActive:YES];
-    [[self->m_invite.trailingAnchor constraintEqualToAnchor:self->m_background.trailingAnchor constant:-30] setActive:YES];
-   
-   //[self->m_background setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:.5]];
-   
+
    [m_name setTextColor:[UIColor whiteColor]];
-   
-   
-   [m_name setBackgroundColor:[UIColor blackColor]];
-    [m_number setTextColor:[UIColor whiteColor]];
-   [m_invite setTextColor:[UIColor lightGrayColor]];
+   [m_number setTextColor:[UIColor whiteColor]];
+  
    [m_number setTextColor:[UIColor lightGrayColor]];
    [m_name   setFont:[UIFont systemFontOfSize:20 weight:UIFontWeightHeavy]];
-   [m_invite   setFont:[UIFont fontWithName:@"GillSans-Semibold" size:13]];
+   
    [m_number   setFont:[UIFont fontWithName:@"GillSans-Semibold" size:17]];
    [m_name setTextAlignment:NSTextAlignmentCenter];
    [self setSelectionStyle:UITableViewCellSelectionStyleNone];
-   [self setBackgroundColor:[UIColor blackColor]];
+   [self setBackgroundColor:[UIColor clearColor]];
    
 
-   
-   
-  
-   //[[self->m_number.bottomAnchor constraintEqualToAnchor:self->m_name.bottomAnchor constant:-20] setActive:YES];
-   //self labe
 
    m_name.layer.cornerRadius=23;
    m_name.layer.masksToBounds=YES;
@@ -97,7 +83,7 @@
 @implementation ContactViewController
 @synthesize m_emailTableView;
 @synthesize m_searchContact;
-
+@synthesize  m_mainView;
 
 
 
@@ -127,7 +113,10 @@
     [m_emailTableView setRowHeight:100];
     [m_emailTableView registerClass:[ContactTableViewCell self] forCellReuseIdentifier:@"ContactList"];
     
- 
+    m_mainView.layer.shadowOffset  = CGSizeZero;
+    m_mainView.layer.shadowOpacity = 1.f;
+    m_mainView.layer.shadowRadius=5;
+    m_mainView.layer.cornerRadius=10;
     // Do any additional setup after loading the view.
 }
 
@@ -164,8 +153,6 @@
    }else{
       m_searching=false;
       [m_searchContact resignFirstResponder];
-      
-      
    }
    [m_emailTableView reloadData];
    
@@ -179,31 +166,15 @@
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-  
-
-
-      ContactTableViewCell *cell=[tableView dequeueReusableCellWithIdentifier:@"ContactList" forIndexPath:indexPath];
-
-      
-                     
+         ContactTableViewCell *cell=[tableView dequeueReusableCellWithIdentifier:@"ContactList" forIndexPath:indexPath];
          std::string contactNumber=gloox::JID(m_data->contact(m_searchContact.text.UTF8String)[indexPath.row].jid).username();
          std::string contactName=m_data->contact(m_searchContact.text.UTF8String)[indexPath.row].name;
          NSString *number=[NSString stringWithUTF8String:contactNumber.c_str()];
          NSString *name=[NSString stringWithUTF8String:contactName.c_str()];
          cell->jid=m_data->contact(m_searchContact.text.UTF8String)[indexPath.row].jid;
-         
          //set name and number as in contact
          [cell->m_name setText: name];
          [cell->m_number setText: number];
-         
-         [cell->m_invite setText:@""];
-     
-         if(m_data->contact(m_searchContact.text.UTF8String)[indexPath.row].registered){
-            //[cell->m_invite setText:@"Chat"];
-         }else{
-          //  [cell->m_invite setText:@"invite"];
-         }
-    
       return cell;
       
 }
@@ -215,16 +186,16 @@
       
          if([m_searchContact isFirstResponder])
             [m_searchContact resignFirstResponder];
-         
-    
-        
-         
          ContactTableViewCell *cell=(ContactTableViewCell*)[tableView cellForRowAtIndexPath:indexPath];
           NSString *name=cell->m_name.text;
-         if(m_data->contact(m_searchContact.text.UTF8String)[indexPath.row].registered){
-           
+       auto tmpPartner=m_data->isPartnerExisting(cell->jid);
+         if(tmpPartner.registered){
+             std::string noti_node =tmpPartner.noti_pubsub_node;
+             if(noti_node.empty()){
+                   m_xmppEngine->subscribToNodeItemNoti(gloox::JID(cell->jid));
+             }
             [self viewPartnerChat:cell->jid userName:name];
-            
+             
          }else {
              if(m_xmppEngine &&m_xmppEngine->clientIsconnected()){
                  [m_activityIndicator startAnimating];
@@ -266,33 +237,33 @@
 }
 
 -(void)handleVCard:(const gloox::JID) jid fetchResult:(gloox::VCard*) vcard{
-    [m_activityIndicator stopAnimating];
-    std::cout<<"contact list vcard search :"<<jid.bare()<<std::endl;
-    
-    if(vcard->jabberid().empty()){
-    UIAlertController *unkownPartnerAler=[UIAlertController alertControllerWithTitle:@"Invite" message:@"This Partner is not using GuysApp..." preferredStyle:UIAlertControllerStyleAlert];
-    UIAlertAction *sendMsg=[UIAlertAction actionWithTitle:@"Send Invite" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
+        [m_activityIndicator stopAnimating];
+        std::cout<<"contact list vcard search :"<<jid.bare()<<std::endl;
+        
+        if(vcard->jabberid().empty()){
+        UIAlertController *unkownPartnerAler=[UIAlertController alertControllerWithTitle:@"Invite" message:@"This Partner is not using GuysApp..." preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *sendMsg=[UIAlertAction actionWithTitle:@"Send Invite" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
 
 
-          if(![MFMessageComposeViewController canSendText]) {
-             return;
-          }
+              if(![MFMessageComposeViewController canSendText]) {
+                 return;
+              }
 
-          NSArray *recipents = @[[NSString stringWithUTF8String:jid.username().c_str()]];
-         NSString *message = [NSString stringWithFormat:@"Im using very excisting messaging app called 'GuysApp' available at apple app store, download now and let chat"];
-          MFMessageComposeViewController *messageController = [[MFMessageComposeViewController alloc] init];
-          messageController.messageComposeDelegate = self;
-          [messageController setRecipients:recipents];
-          [messageController setBody:message];
+              NSArray *recipents = @[[NSString stringWithUTF8String:jid.username().c_str()]];
+             NSString *message = [NSString stringWithFormat:@"Im using very excisting messaging app called 'GuysApp' available at apple app store, download now and let chat"];
+              MFMessageComposeViewController *messageController = [[MFMessageComposeViewController alloc] init];
+              messageController.messageComposeDelegate = self;
+              [messageController setRecipients:recipents];
+              [messageController setBody:message];
 
-          // Present message view controller on screen
-          [self presentViewController:messageController animated:YES completion:nil];
+              // Present message view controller on screen
+              [self presentViewController:messageController animated:YES completion:nil];
 
-    }];
-    UIAlertAction *close=[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {}];
-    [unkownPartnerAler addAction:sendMsg];
-    [unkownPartnerAler addAction:close];
-    [self presentViewController:unkownPartnerAler animated:YES completion:nil];
+        }];
+        UIAlertAction *close=[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {}];
+        [unkownPartnerAler addAction:sendMsg];
+        [unkownPartnerAler addAction:close];
+        [self presentViewController:unkownPartnerAler animated:YES completion:nil];
 
     }else{
         m_data->setPartnerRegistered(jid.bare(), YES);
@@ -303,3 +274,4 @@
 }
 
 @end
+

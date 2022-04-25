@@ -16,9 +16,14 @@ NS_ASSUME_NONNULL_BEGIN
 -(void)downloadDownloadFile:(NSIndexPath*) index url:(NSString*)urlStr msgID:(NSString*)_id;
 -(void)handleDelShr:(UILongPressGestureRecognizer*)gester;
 @end
-@interface ChatCollectionViewCell : UICollectionViewCell<ChatDownloadFileDeleagate,UIGestureRecognizerDelegate>{
+
+@interface ChatLable:UILabel
+@end;
+@interface ChatCollectionViewCell : UICollectionViewCell<ChatDownloadFileDeleagate,UIGestureRecognizerDelegate,AVPlayerViewControllerDelegate>{
   @public
-    UILabel *m_msg;
+    UIView* m_containerView;
+    UIImageView* m_incomingTextBuble;
+    ChatLable *m_msg;
     UILabel* m_time;
     UILabel* m_msgEvent;
     UIImageView* m_imageView;
@@ -42,7 +47,9 @@ NS_ASSUME_NONNULL_BEGIN
     UILongPressGestureRecognizer *m_longPreseGesture;
      AppData::MESSAGETYPE m_msgType;
     
-     NSDateFormatter * m_formatter;
+    NSDateFormatter * m_formatter;
+   
+    
     
 }
 -(void)setDownloadDelegate:(id)delegate indexPath:(NSIndexPath *)index;

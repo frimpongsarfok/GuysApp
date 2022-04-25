@@ -27,7 +27,8 @@ XmppEgine::XmppEgine(id delegate,const std::string user_jid,const std::string pw
                 m_registration(nullptr),
                 m_streams({}),
                 m_sock5Serverlistening(nullptr),
-    
+                m_privacyManager(nullptr),
+                m_partnerBlockList({}),
                 m_future(),
                 m_deviceToken(""),
                 m_delegate(nullptr),
@@ -47,25 +48,21 @@ XmppEgine::XmppEgine(id delegate,const std::string user_jid,const std::string pw
         m_server=server;
         m_client->registerMessageSessionHandler(this,0);
         m_client->registerStanzaExtension(new gloox::ChatState(ChatStateActive));
+        m_client->registerStanzaExtension(new gloox::PubSub::Event());
         m_client->registerPresenceHandler(this);
-        
-        m_client->logInstance().registerLogHandler(gloox::LogLevelDebug, gloox::LogAreaAll, this);;
+        m_client->logInstance().registerLogHandler(gloox::LogLevelDebug, gloox::LogAreaAll, this);
         m_privacyManager=new gloox::PrivacyManager(m_client);
-        
+        m_privacyManager->setDefault("PartnerBlockedList");
         m_privacyManager->registerPrivacyListHandler(this);
         m_client->rosterManager()->registerRosterListener(this,true);
         m_vcardManager=new gloox::VCardManager(m_client);
         m_client->disco()->addFeature(gloox::XMLNS_CHAT_STATES);
-     
         m_client->setTls(gloox::TLSRequired);
- 
         registrationMode=false;
         //file
         //m_sockManager=new gloox::SOCKS5BytestreamManager(m_client->logInstance(),this);
         m_fileTransferManager=new HttpFileUpload(gloox::JID("upload."+server),m_client);
         m_fileTransferManager->registerHttpFileUploadHandler(this);
-        
-        
         //pubsub
         m_pubsubMang=new gloox::PubSub::Manager(m_client);
         m_client->disco()->setVersion( "GuysApp", gloox::GLOOX_VERSION, "ios" );
@@ -74,7 +71,7 @@ XmppEgine::XmppEgine(id delegate,const std::string user_jid,const std::string pw
        // m_sock5Serverlistening=false;
         //gloox::ConnectionError le = gloox::ConnNoError;
         //if((le=m_sockServer->listen())!=gloox::ConnNoError){
-        //    //std::cout<<"listening return : "<<le<<std::endl;
+        //    std::cout<<"listening return : "<<le<<std::endl;
         //    return;
        // }
         // m_sock5Serverlistening=true;
@@ -89,7 +86,7 @@ XmppEgine::XmppEgine(id delegate,const std::string user_jid,const std::string pw
         connect();
  
         } catch (const std::exception& e) {
-            //std::cout<<"Xmpp Error : "<<e.what()<<std::endl;
+            std::cout<<"Xmpp Error : "<<e.what()<<std::endl;
         }
                
                     
@@ -122,7 +119,7 @@ bool XmppEgine::connect(){
                                  return;
                      gloox::ConnectionError ce=gloox::ConnNoError;
                       m_appRunning=true;
-                      while (ce==gloox::ConnNoError) {
+                      while (ce==gloox::ConnNoError && m_client) {
                           
                           if(m_appRunning){
                               ce=m_client->recv(100);
@@ -136,19 +133,19 @@ bool XmppEgine::connect(){
                           
                          if(ce!=gloox::ConnNoError ){
                               if (ce==gloox::ConnectionError::ConnUserDisconnected){
-                                   //std::cout<<"disconnect "<<ce<<std::endl;
+                                   std::cout<<"disconnect "<<ce<<std::endl;
                                 break;
                               }
 
-                          //std::cout<<" client  fail to recv data from server"<<std::endl;
+                          std::cout<<" client  fail to recv data from server"<<std::endl;
                           break;
 
                         }
                       }
                     
                 }catch (std::exception ex) {
-                    //std::cout<<"Connection Errr:"<<std::endl;
-                       // //std::cout<<"Connection Exception Occured :"<<ex.what()<<std::endl;
+                    std::cout<<"Connection Errr:"<<std::endl;
+                       // std::cout<<"Connection Exception Occured :"<<ex.what()<<std::endl;
                 }
             });
                 
@@ -167,24 +164,24 @@ bool XmppEgine::connect(){
 //                              ce=m_client->recv(00);
 //                             if(ce!=gloox::ConnNoError ){
 //                                  if (ce==gloox::ConnectionError::ConnUserDisconnected){
-//                                       //std::cout<<"disconnect "<<ce<<std::endl;
+//                                       std::cout<<"disconnect "<<ce<<std::endl;
 //                                    break;
 //                                  }
 //
-//                              //std::cout<<" client  fail to recv data from server"<<std::endl;
+//                              std::cout<<" client  fail to recv data from server"<<std::endl;
 //                              break;
 //
 //                          }
 //                        }
 //                    }catch(std::exception ex ){
-//                        //std::cout<<"connection stream errr : "<<ex.what()<<std::endl;
+//                        std::cout<<"connection stream errr : "<<ex.what()<<std::endl;
 //                    }
              
                 
              //if(m_sockServer){
              //   se=m_sockServer->recv(1);
              //   if(se!=gloox::ConnNoError){
-            //        //std::cout<<" sock5  fail to recv data from server ,return :"<<se<<std::endl;
+            //        std::cout<<" sock5  fail to recv data from server ,return :"<<se<<std::endl;
              //         break;
              // delete m_sockServer;
              // m_sockServer=nullptr;
@@ -196,7 +193,7 @@ bool XmppEgine::connect(){
             //}
     } catch (NSException* ex) {
         NSLog(@"Connection Errr: %@",[ex reason]);
-       // //std::cout<<"Connection Exception Occured :"<<ex.what()<<std::endl;
+       // std::cout<<"Connection Exception Occured :"<<ex.what()<<std::endl;
         return false;
     }
     
@@ -208,7 +205,7 @@ bool XmppEgine::connect(){
 
 void XmppEgine::handleSendFileResult(HttpFileUploadHandler::HttpFileUploadResult result){
 
-    
+    std::cout<<"file sending result"<<result<<std::endl;
 }
 
 
@@ -217,7 +214,7 @@ void XmppEgine::handleSlot(const std::string _id,const std::string slot,const st
     switch (type) {
            
         case HttpFileUploadHandler::FILE_INFO:{
-            //std::cout<<"FILE_INFO :"<<slot<<std::endl;
+            std::cout<<"FILE_INFO :"<<slot<<std::endl;
             //const gloox::Message m(gloox::Message::Chat,getToJID(),url,std::to_string(type));
             //s
             std::get<0>(m_fileSendingInfo)=slot;
@@ -233,7 +230,7 @@ void XmppEgine::handleSlot(const std::string _id,const std::string slot,const st
         case HttpFileUploadHandler::GET:{
           
            
-            //std::cout<<"GET URL :"<<slot<<std::endl;
+            std::cout<<"GET URL :"<<slot<<std::endl;
            // const gloox::Message m(gloox::Message::Chat,getToJID(),url,std::to_string(type));
             std::get<1>(m_fileSendingInfo)=slot;
             
@@ -242,7 +239,7 @@ void XmppEgine::handleSlot(const std::string _id,const std::string slot,const st
             break;
         case HttpFileUploadHandler::PUT:{
             std::get<2>(m_fileSendingInfo)=slot;
-            //std::cout<<"PUT URL :"<<slot<<std::endl;
+            std::cout<<"PUT URL :"<<slot<<std::endl;
             
             
            
@@ -273,7 +270,7 @@ void XmppEgine::handleSlot(const std::string _id,const std::string slot,const st
 
 
 bool XmppEgine::handleIq(const gloox::IQ &iq){
-    ////std::cout<<"iq  "<<iq.from().bare()<<std::endl;
+    //std::cout<<"iq  "<<iq.from().bare()<<std::endl;
     return true;
 }
 void XmppEgine::handleIqID (const gloox::IQ &iq, int context){
@@ -298,9 +295,10 @@ inline void XmppEgine::setIpNPort(const std::string& message){
 
 inline void XmppEgine::onConnect(){
     m_clientConnected=true;
-    //std::cout<<"connect : "<<std::endl;
+    std::cout<<"connect : "<<std::endl;
     if(m_delegate)
        [m_delegate connected];
+   
     
    
     
@@ -309,7 +307,7 @@ inline void XmppEgine::onConnect(){
 inline void XmppEgine::onDisconnect(gloox::ConnectionError e){
         
             m_clientConnected=false;
-            //std::cout<<"disconnected : "<<e<<std::endl;
+            std::cout<<"disconnected : "<<e<<std::endl;
             m_listeningToStreams=false;
             m_client=nullptr;
             m_appRunning=false;
@@ -345,6 +343,7 @@ void XmppEgine::handleVCard(const gloox::JID& jid,const gloox::VCard* vcard){
             if(m_delegate)
                 dispatch_sync(dispatch_get_main_queue(), ^{
                      [m_delegate handleSelfVCard:vcard];
+                    
                     
                 });
             
@@ -444,7 +443,7 @@ inline void XmppEgine::handleRoster( const gloox::Roster& roster ){
     dispatch_sync(dispatch_get_main_queue(), ^{
         if(m_delegate)
             [m_delegate handleRoster:roster];
-        //std::cout<<"\t rosterss \trjrjrrj"<<roster.size()<<std::endl;
+        std::cout<<"\t rosterss \trjrjrrj"<<roster.size()<<std::endl;
     });
 
 }
@@ -466,7 +465,7 @@ inline void XmppEgine::handleRosterPresence( const gloox::RosterItem& item, cons
 
 inline void XmppEgine::handleSelfPresence( const gloox::RosterItem& item, const std::string& resource,gloox::Presence::PresenceType presence, const std::string& msg ){
     dispatch_sync(dispatch_get_main_queue(), ^{
-        //std::cout<<"self presence"<<presence<<": " <<msg <<std::endl;
+        std::cout<<"self presence"<<presence<<": " <<msg <<std::endl;
         if(m_delegate)
             [m_delegate  hanldeSelfPresence:item resource:resource presence:presence message:msg];
     });
@@ -539,7 +538,7 @@ void XmppEgine::createMessageSesstion(const gloox::JID jid){
 
 //using taghandle because  gloox::handlemessage  out msg does not include id;
 inline void XmppEgine::handleTag(    gloox::Tag *     tag    ){
-    //std::cout<<"tag message called"<<std::endl;
+    std::cout<<"tag message called"<<std::endl;
 //
 //    if(!m_parser)
 //        return;
@@ -606,8 +605,44 @@ inline void XmppEgine::handleTag(    gloox::Tag *     tag    ){
 }
 inline void XmppEgine::handleMessage( const gloox::Message& msg, gloox::MessageSession* session  ){
   
-    
-    
+       //pubsubevent
+    const gloox::PubSub::Event* pse = msg.findExtension<PubSub::Event>( gloox::ExtPubSubEvent );
+    if( pse )
+    {
+      // use the Event
+        std::cout<<"new pubsub event"<<std::endl;
+       
+        for(auto *item:pse->items()){
+            if(!item->retract){
+                const gloox::Tag* itemTag=item->payload;
+                const gloox::Tag* notifionTag= itemTag->findChild("notification");
+                if(notifionTag){
+                    PUBSUB_NOTI_TYPE type=(PUBSUB_NOTI_TYPE)std::stoi(notifionTag->findAttribute("type"));
+                    gloox::JID jid=gloox::JID(notifionTag->findAttribute("jid"));
+                    switch (type) {
+                        case PUBSUB_NOTI_TYPE::PROFILE_UPDATE : {
+                            std::cout<<"profile update from "<<jid.bare()<<std::endl;
+                            fetchVCard(jid);
+                        }
+                        break;
+
+                        default:
+                            break;
+                    }
+                }
+            }
+        }
+        
+//
+//            gloox::PubSub::Item *item=itemList.front();
+//
+//
+           
+//
+//        }
+        return;
+    }
+     
          //chatsate messages
     
         gloox::JID jid=gloox::JID();
@@ -621,7 +656,7 @@ inline void XmppEgine::handleMessage( const gloox::Message& msg, gloox::MessageS
     if([NSThread isMainThread]){
         if(m_delegate)
             [m_delegate handleMessage:msg session:session];
-            //std::cout<<"session handling"<<std::endl;
+            std::cout<<"session handling"<<std::endl;
         
     }else{
         dispatch_sync(dispatch_get_main_queue(), ^{
@@ -637,7 +672,7 @@ inline void XmppEgine::handleMessage( const gloox::Message& msg, gloox::MessageS
 }
 inline void XmppEgine::handleChatState( const gloox:: JID& from,gloox:: ChatStateType state ){
 
-    //std::cout<<"chatssssssssssssssssss evvvvveeennt"<<std::endl;
+    std::cout<<"chatssssssssssssssssss evvvvveeennt"<<std::endl;
     dispatch_sync(dispatch_get_main_queue(), ^{
         if(m_delegate)
             [m_delegate handleChatState:from state:state];
@@ -651,7 +686,9 @@ inline void XmppEgine::handlePresence( const gloox::Presence& presence ){
     if(presence.from()==getMyJID() ){
         if(presence.presence()==gloox::Presence::PresenceType::Available){
             m_privacyManager->requestListNames();
+            m_privacyManager->requestList("PartnerBlockedList");
             m_fileTransferManager->getServerCapability();
+           // m_pubsubMang->getNodeConfig(getPubsubNotificationServiceName(),getPubsubNodeName(), this);
         }
    
         m_presence=gloox::Presence(presence.subtype(),presence.to(),presence.status(),presence.presence());
@@ -664,7 +701,7 @@ inline void XmppEgine::handlePresence( const gloox::Presence& presence ){
         
 
     if(m_delegate){
-              // //std::cout<<"presence from : "<<pre.from().full()<<" "<<pre.presence()<<" "<<pre.tag()->xml()<<std::endl;
+              // std::cout<<"presence from : "<<pre.from().full()<<" "<<pre.presence()<<" "<<pre.tag()->xml()<<std::endl;
            [m_delegate handlePresence:presence];
         }
         
@@ -739,7 +776,8 @@ XmppEgine::XmppEgine(id delegate,const std::string& server):
                                                     m_listeningToStreams(false),
                                                     m_running(false),
                                                    m_lastActivityManager(nullptr),
-                                                
+                                                   m_privacyManager(nullptr),
+                                                    m_partnerBlockList({}),
                                                     m_parser(nullptr){
     try {
         m_delegate=delegate;
@@ -756,9 +794,10 @@ XmppEgine::XmppEgine(id delegate,const std::string& server):
         registrationMode=true;
         m_listeningToStreams=false;
         m_parser=nullptr;
+        
         connect();
     } catch (std::exception err) {
-        //std::cout<<" c++ registration error occured in registration :"<<err.what()<<std::endl;
+        std::cout<<" c++ registration error occured in registration :"<<err.what()<<std::endl;
        
     }catch(NSException *objcErr){
         NSLog(@"%@",[objcErr description]);
@@ -768,18 +807,18 @@ XmppEgine::XmppEgine(id delegate,const std::string& server):
 
 void XmppEgine::handleRegistrationResult(const gloox::JID& from ,gloox::RegistrationResult result){
      dispatch_sync(dispatch_get_main_queue(), ^{
-         //std::cout<<"registration result :"<<result<<std::endl;
+         std::cout<<"registration result :"<<result<<std::endl;
         if(m_delegate)//{
             [m_delegate handleRegistrationResult:from registreationResult:result];
      });
 }
 void XmppEgine::handleRegistrationFields(const gloox::JID& jid,int fiedls, std::string instruction){
-    //std::cout<<"registration feilds :"<<fiedls<<" : instruction :"<<instruction<<std::endl;
+    std::cout<<"registration feilds :"<<fiedls<<" : instruction :"<<instruction<<std::endl;
     if(m_delegate)
       [ m_delegate handleRegistrationFields:jid Fields:fiedls Instruction:instruction];
 }
 void XmppEgine::handleDataForm(const gloox::JID& jid,const gloox::DataForm& data){
-    //std::cout<<"this is dataformmm"<<std::endl;
+    std::cout<<"this is dataformmm"<<std::endl;
     if(m_delegate)
         [m_delegate handleDataForm:jid dataForm:data];
 }
@@ -791,7 +830,7 @@ void XmppEgine::handleAlreadyRegistered(const gloox::JID& from){
     
     if(m_delegate)
         [m_delegate handleAlreadyRegistered:from];
-        //std::cout<<"account already exist"<<std::endl;
+        std::cout<<"account already exist"<<std::endl;
 }
 
 void XmppEgine::registerAccount(const std::string userName,const std::string password){
@@ -799,7 +838,7 @@ void XmppEgine::registerAccount(const std::string userName,const std::string pas
         gloox::RegistrationFields fields;
         fields.username=userName;
         fields.password=password;
-        //std::cout<<"user name and pwd :"<<userName<<"\t"<<password<<std::endl;
+        std::cout<<"user name and pwd :"<<userName<<"\t"<<password<<std::endl;
         //gloox::DataForm *userForm=new gloox::DataForm(gloox::TypeSubmit);
        //userForm->setTitle("Creating a new account");
        //userForm->addField(gloox::DataFormField::TypeTextSingle,"username",userName,"Username");
@@ -807,7 +846,7 @@ void XmppEgine::registerAccount(const std::string userName,const std::string pas
         
         m_registration->createAccount(5,fields);
     } catch (std::exception ex) {
-        //std::cout<<ex.what()<<std::endl;
+        std::cout<<ex.what()<<std::endl;
     }
     
   
@@ -835,7 +874,7 @@ bool XmppEgine::deleteAccount(){
         }
        
     } catch (std::exception ex) {
-        //std::cout<<ex.what()<<std::endl;
+        std::cout<<ex.what()<<std::endl;
     }
     return false;
 }
@@ -845,7 +884,7 @@ void XmppEgine::fetchFields(){
 }
 void XmppEgine::registerDeviceToken(std::string token){
     if(!getMyJID().bare().size() && m_clientConnected){
-        //std::cout<<"Error Cant register device, my JID is empty"<<getMyJID().bare()<<std::endl;
+        std::cout<<"Error Cant register device, my JID is empty"<<getMyJID().bare()<<std::endl;
         return;
     }
     std::async(std::launch::async, [this,&token](){
@@ -864,7 +903,7 @@ void XmppEgine::registerDeviceToken(std::string token){
         //gloox::IQ *iq=new gloox::IQ(gloox::IQ::Set,m_client->jid().server());
         //iq->addExtension(cmd);
         //m_client->send(*iq);
-        ////std::cout<<"/////// "<<m_adhocCommand->tag()->xml()<<std::endl;
+        //std::cout<<"/////// "<<m_adhocCommand->tag()->xml()<<std::endl;
         
     });
 
@@ -873,27 +912,27 @@ void XmppEgine::registerDeviceToken(std::string token){
     
 }
 void    XmppEgine::handleAdhocCommand (const gloox::JID &from, const gloox::Adhoc::Command &command, const std::string &sessionID){
-    //std::cout<<"adhoc command received"<<std::endl;
+    std::cout<<"adhoc command received"<<std::endl;
 }
 
 bool   XmppEgine::handleAdhocAccessRequest (const gloox::JID &from, const std::string &command){
-     //std::cout<<"adhoc command request "<< command<<std::endl;
+     std::cout<<"adhoc command request "<< command<<std::endl;
     return true;
 }
 void   XmppEgine::  handleAdhocSupport (const gloox::JID &remote, bool support, int context){
-     //std::cout<<"adhoc support"<<std::endl;
+     std::cout<<"adhoc support"<<std::endl;
 }
 
 void    XmppEgine:: handleAdhocCommands (const gloox::JID &remote, const gloox::StringMap &commands, int context){
-     //std::cout<<"adhoc command "<<std::endl;
+     std::cout<<"adhoc command "<<std::endl;
 }
 
 void     XmppEgine::handleAdhocError (const gloox::JID &remote, const gloox::Error *error, int context){
-    //std::cout<<"adhoc command erro : "<< context<<std::endl;
+    std::cout<<"adhoc command erro : "<< context<<std::endl;
 }
 
 void      XmppEgine::handleAdhocExecutionResult (const gloox::JID &remote, const gloox::Adhoc::Command &command, int context){
-     //std::cout<<"adhoc resul "<<std::endl;
+     std::cout<<"adhoc resul "<<std::endl;
 }
 
 
@@ -985,25 +1024,40 @@ void XmppEgine::handleBytestreamClose( gloox::Bytestream* bs )
 
 }
 void    XmppEgine::handlePrivacyListNames (const std::string &active, const std::string &def, const gloox::StringList &lists){
+    dispatch_sync(dispatch_get_main_queue(), ^{
     if(m_delegate)
        [m_delegate handlePrivacyListNames:active def:def privacyList:lists];
+    });
 }
 
 void  XmppEgine::handlePrivacyList (const std::string &name, const PrivacyList &items){
+    dispatch_sync(dispatch_get_main_queue(), ^{
+    if(name=="PartnerBlockedList"){
+        m_partnerBlockList=items;
+    }
+        
      if(m_delegate)
-    [m_delegate handlePrivacyList:name privacyList:items];
+         [m_delegate handlePrivacyList:name privacyList:items];
+    });
 }
 
 void    XmppEgine::handlePrivacyListChanged (const std::string &name){
+    dispatch_sync(dispatch_get_main_queue(), ^{
+    getServerBlockedPartList();
      if(m_delegate)
     [m_delegate handlePrivacyListChanged:name];
+    });
+    
 }
 
 void   XmppEgine::handlePrivacyListResult (const std::string &_id, gloox::PrivacyListResult plResult){
+    dispatch_sync(dispatch_get_main_queue(), ^{
     if(m_delegate)
         [m_delegate handlePrivacyListResult:_id result:plResult];
+    });
 }
 void XmppEgine:: handleLastActivityResult( const gloox::JID& jid, long seconds, const std::string& status ) {
+    
     dispatch_sync(dispatch_get_main_queue(), ^{
         if(m_delegate)
             [m_delegate handleLastActivityResult:jid timeInSec:seconds statusMsg:status];
@@ -1021,82 +1075,128 @@ void XmppEgine:: handleLastActivityError( const   gloox::JID& jid, gloox::Stanza
 
    
 void   XmppEgine::handleItem (const gloox::JID &service, const std::string &node, const gloox::Tag *entry){
-    //std::cout<<"handleItem *** "<<node<<std::endl;
+    std::cout<<"handleItem *** "<<node<<std::endl;
+    
+    
 }
    
 void      XmppEgine::handleItems (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::PubSub::ItemList &itemList, const gloox::Error *error){
-    //std::cout<<"handleItems *** "<<node<<std::endl;
+    std::cout<<"handleItems *** "<<node<<std::endl;
 }
    
-void      XmppEgine::handleItemPublication (const std::string &id, const gloox::JID &service, const std::string &node ,const gloox::PubSub::ItemList &itemList, const gloox::Error *error){
-    //std::cout<<"handleItemPublication *** "<<node<<std::endl;
+void  XmppEgine::handleItemPublication (const std::string &id, const gloox::JID &service, const std::string &node ,const gloox::PubSub::ItemList &itemList, const gloox::Error *error){
+    std::cout<<"handleItemPublication *** "<<node<<std::endl;
+    
+   
 }
 void     XmppEgine::handleItemDeletion (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::PubSub::ItemList &itemListclass , const class gloox::Error *error){
-    //std::cout<<"handleItemDeletion *** "<<node<<std::endl;
+    std::cout<<"handleItemDeletion *** "<<node<<std::endl;
 }
-void      XmppEgine::handleSubscriptionResult( const std::string& id, const gloox::JID& service,const std::string& node,const std::string& sid,const gloox::JID& jid,const gloox::PubSub::SubscriptionType subType,const gloox::Error* error  ){
-     //std::cout<<"handleSubscriptionResult *** "<<node<<std::endl;
+void     XmppEgine::handleSubscriptionResult( const std::string& _id, const gloox::JID& service,const std::string& node,const std::string& sid,const gloox::JID& jid,const gloox::PubSub::SubscriptionType subType,const gloox::Error* error  ){
+        std::cout<<"handleSubscriptionResult *** "<<node<< " JID "<<jid.full() <<std::endl;
+    if(m_delegate){
+        [m_delegate handleSubscriptionResult:_id serviceName:service nodeName:node SID:sid JID:jid subscriptionType:subType err:error];
+    }
 }
 
 
    
 void      XmppEgine::handleUnsubscriptionResult (const std::string &id, const gloox::JID &service, const gloox::Error *error){
-    //std::cout<<"handleUnsubscriptionResult *** "<<service.full()<<std::endl;
+    std::cout<<"handleUnsubscriptionResult *** "<<service.full()<<std::endl;
 }
    
 void      XmppEgine::handleSubscriptionOptions (const std::string &id, const gloox::JID &service, const gloox::JID &jid, const std::string &node, const gloox::DataForm *options, const std::string &sid, const gloox::Error *error){
-    //std::cout<<"handleSubscriptionOptions *** "<<node<<std::endl;
+    std::cout<<"handleSubscriptionOptions *** "<<node<<std::endl;
 }
    
 void     XmppEgine::handleSubscriptionOptionsResult (const std::string &id, const gloox::JID &service, const gloox::JID &jid, const std::string &node, const std::string &sid, const gloox::Error *error){
-    //std::cout<<"handleSubscriptionOptionsResult *** "<<node<<std::endl;
+    std::cout<<"handleSubscriptionOptionsResult *** "<<node<<std::endl;
 }
    
  void     XmppEgine::handleSubscribers (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::PubSub::SubscriptionList &list, const gloox::Error *error){
-     //std::cout<<"handleSubscribers *** "<<node<<std::endl;
+     std::cout<<"handleSubscribers *** "<<node<<std::endl;
 }
    
  void    XmppEgine:: handleSubscribersResult (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::PubSub::SubscriberList *list, const gloox::Error *error){
-     //std::cout<<"handleSubscribersResult *** "<<node<<std::endl;
+     std::cout<<"handleSubscribersResult *** "<<node<<std::endl;
 
 }
    
  void    XmppEgine:: handleAffiliates (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::PubSub::AffiliateList *list, const gloox::Error *error){
-     //std::cout<<"handleAffiliates *** "<<node<<std::endl;
+     
+     std::cout<<"handleAffiliates *** "<<node<<std::endl;
+     if(error){
+         std::cout<<"fail to get affiliation "<<node<<" "<<error->text()<<std::endl;
+     }else{
+         if(node!=getPubsubNodeName()){
+             for(gloox::PubSub::Affiliate affiliation:*list){
+                 if(affiliation.type==gloox::PubSub::AffiliationType::AffiliationNone){
+                     subscribToNodeItemNoti(node);
+                 }
+             }
+         }
+         
+         
+     }
 }
    
 void     XmppEgine::handleAffiliatesResult (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::PubSub::AffiliateList *list, const gloox::Error *error){
-    //std::cout<<"handleAffiliatesResult *** "<<node<<std::endl;
+    std::cout<<"handleAffiliatesResult *** "<<node<<std::endl;
 }
    
 void     XmppEgine::handleNodeConfig (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::DataForm *config, const gloox::Error *error){
-    //std::cout<<"handleNodeConfig *** "<<node<<std::endl;
+    
+    
+    try {
+        if(error){
+            if(error->type()==gloox::StanzaErrorType::StanzaErrorTypeCancel && node==getPubsubNodeName()){
+                createNotificationNode();
+                return;
+            }
+        }else{
+            std::cout<<"handleNodeConfig *** "<<node<<std::endl;
+            for (auto instruction : config->fields()) {
+                std::cout<<"field : "<<instruction->name()<<"\t"<<instruction->value()<<std::endl;
+            }
+          ;
+        }
+       
+        
+    } catch (std::exception err) {
+        std::cout<<err.what()<<std::endl;
+    }
+    
+   
+    
+    
+    
 }
    
 void     XmppEgine::handleNodeConfigResult (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::Error *error){
-    //std::cout<<"handleNodeConfigResult *** "<<node<<std::endl;
+    std::cout<<"handleNodeConfigResult *** "<<node<<std::endl;
 }
    
 void     XmppEgine::handleNodeCreation (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::Error *error){
-    //std::cout<<"handleNodeCreation *** "<<node<<std::endl;
+    std::cout<<"handleNodeCreation *** "<<node<<std::endl;
 }
    
 void     XmppEgine::handleNodeDeletion (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::Error *error){
-    //std::cout<<"handleNodeDeletion *** "<<node<<std::endl;
+    std::cout<<"handleNodeDeletion *** "<<node<<std::endl;
 }
    
  void     XmppEgine::handleNodePurge (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::Error *error){
-     //std::cout<<"handleNodePurge *** "<<node<<std::endl;
+     std::cout<<"handleNodePurge *** "<<node<<std::endl;
 }
 
  void     XmppEgine::handleSubscriptions (const std::string &id, const gloox::JID &service, const gloox::PubSub::SubscriptionMap &subMap, const gloox::Error *error){
-     //std::cout<<"handleSubscriptions *** "<<service.full()<<std::endl;
+     std::cout<<"handleSubscriptions *** "<<service.full()<<std::endl;
 }
    
 void     XmppEgine::handleAffiliations (const std::string &id, const gloox::JID &service, const gloox::PubSub::AffiliationMap &affMap, const gloox::Error *error){
-    //std::cout<<"handleAffiliations *** "<<service.full()<<std::endl;
+    std::cout<<"handleAffiliations *** "<<service.full()<<std::endl;
 }
 void     XmppEgine::handleDefaultNodeConfig (const std::string &id, const gloox::JID &service, const gloox::DataForm *config, const gloox::Error *error){
-    //std::cout<<"handleDefaultNodeConfig *** "<<service.full()<<std::endl;
+    std::cout<<"handleDefaultNodeConfig *** "<<service.full()<<std::endl;
 }
    
+

@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		57013A0D20F79C2900BCBFE0 /* ReadData.mm in Sources */ = {isa = PBXBuildFile; fileRef = 57013A0B20F79C2900BCBFE0 /* ReadData.mm */; };
 		57065DC221125AF4005B621D /* ContactsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57065DC021125AF4005B621D /* ContactsUI.framework */; };
+		5706C86A2815D49D003D734F /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5795A600209F8D34008DE739 /* Main.storyboard */; };
 		5707E8DD2780D77A00DB2A41 /* MyLastActivity.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5707E8DB2780D77A00DB2A41 /* MyLastActivity.mm */; };
 		5714667623A5FA7900FF9E10 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 571875B821ECB48C000DF913 /* AudioToolbox.framework */; };
 		5714667823A5FA7B00FF9E10 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5794484E21F4094E00E4CD15 /* AVFoundation.framework */; };
@@ -23,6 +24,8 @@
 		572A4E47277002F800035F8F /* ContactViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 572A4E46277002F800035F8F /* ContactViewController.mm */; };
 		5733834F22751F380026D69A /* HttpFileUpload.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5733834D22751F380026D69A /* HttpFileUpload.mm */; };
 		5733835422776A5B0026D69A /* HttpFileUploadHandler.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5733835222776A5B0026D69A /* HttpFileUploadHandler.mm */; };
+		5734C41428063504002DB5DA /* UserNotificationsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 572CE73921E03F850042D521 /* UserNotificationsUI.framework */; };
+		5734C4172806350D002DB5DA /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 572CE73A21E03F860042D521 /* UserNotifications.framework */; };
 		577D428B27A3DA1A006FC12A /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 577D428A27A3DA1A006FC12A /* WebKit.framework */; };
 		5780D61527734FE7003C9149 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5780D61427734FE7003C9149 /* Assets.xcassets */; };
 		5788DC0122BE96F6007C7F26 /* ChatCollectionViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5788DC0022BE96F6007C7F26 /* ChatCollectionViewController.mm */; };
@@ -35,8 +38,6 @@
 		5794C8A72789485200601FE0 /* GuysAppNS.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 5794C89F2789485200601FE0 /* GuysAppNS.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5794C8B527894F9700601FE0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 57E343B722CE400C005ABE6D /* UIKit.framework */; };
 		5794C8B727894FCA00601FE0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 5794C8B627894FCA00601FE0 /* Foundation.framework */; };
-		5794C8C227895CDD00601FE0 /* UserNotificationsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 572CE73921E03F850042D521 /* UserNotificationsUI.framework */; };
-		5794C8C527895CE200601FE0 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 572CE73A21E03F860042D521 /* UserNotifications.framework */; };
 		5794C8C727895DE200601FE0 /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 572CE73A21E03F860042D521 /* UserNotifications.framework */; };
 		5794C8C827895DE200601FE0 /* UserNotificationsUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 572CE73921E03F850042D521 /* UserNotificationsUI.framework */; };
 		5794C8CA2789FA7200601FE0 /* gloox in Resources */ = {isa = PBXBuildFile; fileRef = 5794C8C92789FA7200601FE0 /* gloox */; };
@@ -45,7 +46,6 @@
 		5795A5F9209F8D34008DE739 /* main.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5795A5F8209F8D34008DE739 /* main.mm */; };
 		5795A5FC209F8D34008DE739 /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5795A5FB209F8D34008DE739 /* AppDelegate.mm */; };
 		5795A5FF209F8D34008DE739 /* ViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5795A5FE209F8D34008DE739 /* ViewController.mm */; };
-		5795A602209F8D34008DE739 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5795A600209F8D34008DE739 /* Main.storyboard */; };
 		5795A60A209F8D34008DE739 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5795A608209F8D34008DE739 /* LaunchScreen.storyboard */; };
 		5795A63B20A0694A008DE739 /* XmppEngine.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5795A63A20A0694A008DE739 /* XmppEngine.mm */; };
 		5795F44D22495D8300DED8D9 /* CountryCode.js in Resources */ = {isa = PBXBuildFile; fileRef = 5795F44C22495D8300DED8D9 /* CountryCode.js */; };
@@ -55,7 +55,7 @@
 		579BAF9B277E022D00C59F75 /* Guys_UITestsLaunchTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 579BAF9A277E022D00C59F75 /* Guys_UITestsLaunchTests.mm */; };
 		57A8FA912104FBB000FB700B /* AccountViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 57A8FA902104FBB000FB700B /* AccountViewController.mm */; };
 		57AC04AD2102331D0074722C /* CreateAccountViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 57AC04AC2102331D0074722C /* CreateAccountViewController.mm */; };
-		57E6FEA627AC9C2E000B12F3 /* GuysAppPushCert.p12 in Resources */ = {isa = PBXBuildFile; fileRef = 57E6FEA527AC9C2D000B12F3 /* GuysAppPushCert.p12 */; };
+		57C3B3CE27DE35B300B786DC /* GuysAppPushCert.p12 in Resources */ = {isa = PBXBuildFile; fileRef = 57C3B3CD27DE35B200B786DC /* GuysAppPushCert.p12 */; };
 		57E89BEE2293030600DE4884 /* MyPlayerViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 57E89BED2293030600DE4884 /* MyPlayerViewController.mm */; };
 		57E89BF522A01B3300DE4884 /* NewMsgTagView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 57E89BF422A01B3300DE4884 /* NewMsgTagView.mm */; };
 		57E9CB2322E4BC9E00C9AA98 /* Demo.mm in Sources */ = {isa = PBXBuildFile; fileRef = 57E9CB2222E4BC9E00C9AA98 /* Demo.mm */; };
@@ -127,10 +127,10 @@
 		5733834E22751F380026D69A /* HttpFileUpload.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = HttpFileUpload.hpp; sourceTree = "<group>"; };
 		5733835222776A5B0026D69A /* HttpFileUploadHandler.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = HttpFileUploadHandler.mm; sourceTree = "<group>"; };
 		5733835322776A5B0026D69A /* HttpFileUploadHandler.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = HttpFileUploadHandler.hpp; sourceTree = "<group>"; };
+		5734C41B2806376A002DB5DA /* GuysApp.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = GuysApp.entitlements; sourceTree = "<group>"; };
 		57764E282789472700179E1E /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
 		577D428A27A3DA1A006FC12A /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		5780D61427734FE7003C9149 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = "../../../../../../Users/sarfokantankafrimpong/Downloads/AppIcons (1)/Assets.xcassets"; sourceTree = "<group>"; };
-		57830D4D22E7F7460018C822 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Main.strings; sourceTree = "<group>"; };
 		57830D4E22E7F7460018C822 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		5788DBFF22BE96F6007C7F26 /* ChatCollectionViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ChatCollectionViewController.h; sourceTree = "<group>"; };
 		5788DC0022BE96F6007C7F26 /* ChatCollectionViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ChatCollectionViewController.mm; sourceTree = "<group>"; };
@@ -177,10 +177,10 @@
 		57A8FA902104FBB000FB700B /* AccountViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = AccountViewController.mm; sourceTree = "<group>"; };
 		57AC04AB2102331D0074722C /* CreateAccountViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CreateAccountViewController.h; sourceTree = "<group>"; };
 		57AC04AC2102331D0074722C /* CreateAccountViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = CreateAccountViewController.mm; sourceTree = "<group>"; };
+		57C3B3CD27DE35B200B786DC /* GuysAppPushCert.p12 */ = {isa = PBXFileReference; lastKnownFileType = file; path = GuysAppPushCert.p12; sourceTree = "<group>"; };
 		57E343B722CE400C005ABE6D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		57E343BC22CE4267005ABE6D /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
 		57E6FE5E27AC782F000B12F3 /* GuysApp.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = GuysApp.xctestplan; sourceTree = "<group>"; };
-		57E6FEA527AC9C2D000B12F3 /* GuysAppPushCert.p12 */ = {isa = PBXFileReference; lastKnownFileType = file; path = GuysAppPushCert.p12; sourceTree = "<group>"; };
 		57E89BE92292F87700DE4884 /* AudioUnit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioUnit.framework; path = System/Library/Frameworks/AudioUnit.framework; sourceTree = SDKROOT; };
 		57E89BEC2293030600DE4884 /* MyAVPlayerViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MyAVPlayerViewController.h; sourceTree = "<group>"; };
 		57E89BED2293030600DE4884 /* MyPlayerViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MyPlayerViewController.mm; sourceTree = "<group>"; };
@@ -212,15 +212,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5734C41428063504002DB5DA /* UserNotificationsUI.framework in Frameworks */,
 				571EFA0E22B32B6F007F6898 /* MessageUI.framework in Frameworks */,
 				5714667C23A5FA7F00FF9E10 /* Contacts.framework in Frameworks */,
 				577D428B27A3DA1A006FC12A /* WebKit.framework in Frameworks */,
 				571EFA0F22B32B6F007F6898 /* Messages.framework in Frameworks */,
 				5714667823A5FA7B00FF9E10 /* AVFoundation.framework in Frameworks */,
-				5794C8C527895CE200601FE0 /* UserNotifications.framework in Frameworks */,
-				5794C8C227895CDD00601FE0 /* UserNotificationsUI.framework in Frameworks */,
 				578E9FEF227F24C000F7B3A9 /* Photos.framework in Frameworks */,
 				5714667623A5FA7900FF9E10 /* AudioToolbox.framework in Frameworks */,
+				5734C4172806350D002DB5DA /* UserNotifications.framework in Frameworks */,
 				5796D3D721453D6700B85E4B /* MobileCoreServices.framework in Frameworks */,
 				5714667A23A5FA7D00FF9E10 /* AVKit.framework in Frameworks */,
 				57065DC221125AF4005B621D /* ContactsUI.framework in Frameworks */,
@@ -310,6 +310,7 @@
 		5795A5F6209F8D34008DE739 /* GuysApp */ = {
 			isa = PBXGroup;
 			children = (
+				5734C41B2806376A002DB5DA /* GuysApp.entitlements */,
 				5780D61427734FE7003C9149 /* Assets.xcassets */,
 				57E9CB2122E4BC9E00C9AA98 /* Demo.h */,
 				5793CC76239E0CA400E6F2CA /* MainCameraViewController.h */,
@@ -366,7 +367,7 @@
 				5795A60B209F8D34008DE739 /* Info.plist */,
 				5795A5F7209F8D34008DE739 /* Supporting Files */,
 				5795F44C22495D8300DED8D9 /* CountryCode.js */,
-				57E6FEA527AC9C2D000B12F3 /* GuysAppPushCert.p12 */,
+				57C3B3CD27DE35B200B786DC /* GuysAppPushCert.p12 */,
 			);
 			path = GuysApp;
 			sourceTree = "<group>";
@@ -485,7 +486,6 @@
 					};
 					5795A5F3209F8D34008DE739 = {
 						CreatedOnToolsVersion = 8.3;
-						ProvisioningStyle = Automatic;
 						SystemCapabilities = {
 							com.apple.ApplicationGroups.iOS = {
 								enabled = 1;
@@ -543,9 +543,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				57E6FEA627AC9C2E000B12F3 /* GuysAppPushCert.p12 in Resources */,
+				57C3B3CE27DE35B300B786DC /* GuysAppPushCert.p12 in Resources */,
+				5706C86A2815D49D003D734F /* Main.storyboard in Resources */,
 				5795A60A209F8D34008DE739 /* LaunchScreen.storyboard in Resources */,
-				5795A602209F8D34008DE739 /* Main.storyboard in Resources */,
 				5795F44D22495D8300DED8D9 /* CountryCode.js in Resources */,
 				5780D61527734FE7003C9149 /* Assets.xcassets in Resources */,
 			);
@@ -649,7 +649,6 @@
 			isa = PBXVariantGroup;
 			children = (
 				5795A601209F8D34008DE739 /* Base */,
-				57830D4D22E7F7460018C822 /* es */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -784,7 +783,9 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_ENTITLEMENTS = GuysApp/GuysApp.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development: Sarfo Kantanka Frimpong (T53C35PP79)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development: Sarfo Kantanka Frimpong (T53C35PP79)";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_BITCODE = NO;
@@ -860,7 +861,9 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_ENTITLEMENTS = GuysApp/GuysApp.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Distribution";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Distribution";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_BITCODE = NO;
@@ -913,8 +916,10 @@
 				CLANG_LINK_OBJC_RUNTIME = YES;
 				CLANG_WARN_CXX0X_EXTENSIONS = YES;
 				CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES;
-				CODE_SIGN_ENTITLEMENTS = "";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_ENTITLEMENTS = GuysApp/GuysApp.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3.11;
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -987,8 +992,10 @@
 				CLANG_LINK_OBJC_RUNTIME = YES;
 				CLANG_WARN_CXX0X_EXTENSIONS = YES;
 				CLANG_WARN__EXIT_TIME_DESTRUCTORS = YES;
-				CODE_SIGN_ENTITLEMENTS = "";
-				CODE_SIGN_IDENTITY = "iPhone Developer";
+				CODE_SIGN_ENTITLEMENTS = GuysApp/GuysApp.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
+				CODE_SIGN_INJECT_BASE_ENTITLEMENTS = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 3.11;
 				DEVELOPMENT_ASSET_PATHS = "";
@@ -1052,6 +1059,9 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SN9GWJ73D9;
@@ -1080,6 +1090,8 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SN9GWJ73D9;
@@ -1107,6 +1119,8 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SN9GWJ73D9;
@@ -1134,6 +1148,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "SB.Guys-UITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = GuysApp;
@@ -1147,6 +1163,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = SN9GWJ73D9;

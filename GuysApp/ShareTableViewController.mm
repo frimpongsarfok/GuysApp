@@ -125,7 +125,7 @@
     [super viewDidLoad];
 
     m_activityIndicator=[[UIActivityIndicatorView alloc]init];
-    [m_activityIndicator setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleWhiteLarge];
+    [m_activityIndicator setActivityIndicatorViewStyle:UIActivityIndicatorViewStyleLarge];
     m_activityIndicatorParentView=[[UIView alloc]initWithFrame:self.tableView.bounds];
     [m_activityIndicatorParentView  addSubview:m_activityIndicator];
     [m_activityIndicatorParentView setBackgroundColor:[UIColor  colorWithRed:1 green:.00f blue:.66 alpha:.4]];

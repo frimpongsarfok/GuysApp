@@ -91,7 +91,7 @@
 - (NSString*) stopRecording{
     m_cancel=NO;
     [recorder stop];
-    [audioSession setCategory:AVAudioSessionCategoryMultiRoute error:nil];
+    [audioSession setCategory:AVAudioSessionCategoryMultiRoute withOptions:AVAudioSessionCategoryOptionDefaultToSpeaker error:nil];
     [audioSession setActive:YES error: nil];
     return recorderFilePath;
 

@@ -33,7 +33,7 @@ static NSString * const reuseIdentifier = @"Cell";
 // if count down reach 0 send paused chatsate to partner
 
     if(m_composeTimeSec==0 && m_xmppEngine->clientIsconnected() && [self getToCurrentPresence]){ //when start typing
-       // //std::cout<<"thread ended"<<std::endl;
+       // std::cout<<"thread ended"<<std::endl;
         XmppEgine::MessageSessionInfoType ss=self->m_xmppEngine->getMessageSessionChatState(self->m_toJid);
         gloox::ChatStateFilter *chatState=std::get<2>(ss);
         if(chatState){
@@ -44,19 +44,19 @@ static NSString * const reuseIdentifier = @"Cell";
             //ss=m_xmppEngine->createMessageSessionChatState(m_toJid);
            // chatState=std::get<2>(ss);
            // chatState->setChatState(gloox::ChatStateComposing);
-           // //std::cout<<"typing..."<<std::endl;
+           // std::cout<<"typing..."<<std::endl;
         }
         m_composeTimeSec=10;
         std::thread tmpThread([self,chatState](){ //init thread
             while(m_composeTimeSec){
                 std::this_thread::sleep_for(std::chrono::seconds(1));
-               // //std::cout<<"waiting... :"<<m_composeTimeSec<<std::endl;
+               // std::cout<<"waiting... :"<<m_composeTimeSec<<std::endl;
                 if(m_composeTimeSec==5){
                         if(chatState){
                             chatState->setChatState(gloox::ChatStatePaused);
                             
                         }
-                       // //std::cout<<"paused typing..."<<std::endl;
+                       // std::cout<<"paused typing..."<<std::endl;
                 }else if(m_composeTimeSec==1){
                     chatState->setChatState(gloox::ChatStateActive);
                 }
@@ -74,7 +74,7 @@ static NSString * const reuseIdentifier = @"Cell";
 
 }
 -(BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text{
-   // //std::cout<<"composing..."<<std::endl;
+   // std::cout<<"composing..."<<std::endl;
     
     
     [self startCompose];
@@ -89,6 +89,8 @@ static NSString * const reuseIdentifier = @"Cell";
   
    
         self->m_chat=&self->m_data->getChats(self->m_toJid.bare());
+        m_appDelegate->m_toJid=[NSString stringWithUTF8String: self->m_toJid.bare().c_str()];
+        m_xmppEngine->setToJId(self->m_toJid);
         self->m_scrolled=false;
         if(self->m_xmppEngine){
             
@@ -120,7 +122,7 @@ static NSString * const reuseIdentifier = @"Cell";
     //[((ViewController*) m_appDelegate->m_viewControllar) setChatDelegate:nil];
     // m_chatState=gloox::ChatStateGone;
     // m_appDelegate->m_toJid=nil;
-    // m_xmppEngine->setToJId(gloox::JID());
+       m_xmppEngine->setToJId(gloox::JID());
     // m_currentView=false;
     if(m_xmppEngine->clientIsconnected() &&  [self getToCurrentPresence]){
         XmppEgine::MessageSessionInfoType ss=self->m_xmppEngine->getMessageSessionChatState(self->m_toJid);
@@ -128,7 +130,7 @@ static NSString * const reuseIdentifier = @"Cell";
         if(chatState){
             chatState->setChatState(gloox::ChatStateGone);
         }else{
-            //std::cout<<"chatstate null :"<<m_toJid.bare()<<std::endl;
+            std::cout<<"chatstate null :"<<m_toJid.bare()<<std::endl;
         }
     }
  
@@ -186,8 +188,8 @@ static NSString * const reuseIdentifier = @"Cell";
 
 
     [self setUpMenu];
-    [self setChatMenuConstrains];
-    [self.collectionView setBackgroundColor: [UIColor whiteColor]];
+   [self setChatMenuConstrains];
+    [self.collectionView setBackgroundColor: [UIColor colorNamed:@"main_background"]];
     
     //if(m_xmppEngine)
     //  return;
@@ -264,9 +266,9 @@ static NSString * const reuseIdentifier = @"Cell";
     // Do any additional setup after loading the view.
     
     if([self  getToCurrentPresence]){
-        //std::cout<<"ahey ahey this "<<std::endl;
+        std::cout<<"ahey ahey this "<<std::endl;
     }else{
-        //std::cout<<"aheyii aheyii this "<<std::endl;
+        std::cout<<"aheyii aheyii this "<<std::endl;
     }
     if(self->m_xmppEngine->clientIsconnected() && [self getToCurrentPresence]){
         XmppEgine::MessageSessionInfoType ss=self->m_xmppEngine->getMessageSessionChatState(self->m_toJid);
@@ -291,7 +293,7 @@ static NSString * const reuseIdentifier = @"Cell";
             }else{
                 self->m_partnerPresenceBarItem.title=[NSString stringWithUTF8String:part.lastTimeOnline.c_str()];
             }
-            //std::cout<<"hey hey this "<<m_appDelegate->m_toJid.UTF8String<<std::endl;
+            std::cout<<"hey hey this "<<m_appDelegate->m_toJid.UTF8String<<std::endl;
         }
     return m_isPartnerOnline;
 }
@@ -302,7 +304,7 @@ static NSString * const reuseIdentifier = @"Cell";
 //            [((ViewController*) self->m_appDelegate->m_viewControllar) setChatDelegate:nil];
 //            self->m_chatState=gloox::ChatStateGone;
 //            self->m_appDelegate->m_toJid=nil;
-//            self->m_xmppEngine->setToJId(gloox::JID());
+             self->m_xmppEngine->setToJId(gloox::JID());
 //            self->m_currentView=false;
         }];
     }
@@ -366,29 +368,29 @@ static NSString * const reuseIdentifier = @"Cell";
   
     
     AppData::ChatInfo&info=(*m_chat)[indexPath.row];
-
+    
     switch (info.type) {
         case AppData::MESSAGETYPE::TEXT:{
           
-            CGRect lines=[info.msg boundingRectWithSize:CGSizeMake(self.collectionView.frame.size.width, 5000) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:20]} context:nil];
+            CGRect lines=[info.msg boundingRectWithSize:CGSizeMake(255, CGFLOAT_MAX) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont fontWithName:@"Avenir" size:15]} context:nil];
             
-             return CGSizeMake(self.collectionView.frame.size.width*.9, lines.size.height+50);
+             return CGSizeMake(self.collectionView.frame.size.width, (lines.size.height+40));
         
             break;
         }
         case AppData::MESSAGETYPE::FILE_ASSET_ID:{
             
-            return CGSizeMake(self.collectionView.frame.size.width*.5, 150);
+            return CGSizeMake(self.collectionView.frame.size.width*.95, 70);
             break;
         }
         case AppData::MESSAGETYPE::FILE_URL:{
             
-            return  CGSizeMake(self.collectionView.frame.size.width*.5, 150);
+            return  CGSizeMake(self.collectionView.frame.size.width*.95, 70);
             break;
         }
         case AppData::MESSAGETYPE::DELETE:{
             
-            return CGSizeMake(self.collectionView.frame.size.width*.6, 20);
+            return CGSizeMake(160, 20);
             break;
         }
         case AppData::MESSAGETYPE::WEB_LINK:{
@@ -407,9 +409,10 @@ static NSString * const reuseIdentifier = @"Cell";
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     //if(m_webView)
     //    [m_webView removeFromSuperview];
-   // //std::cout<<"cell selected"<<std::endl;
+   // std::cout<<"cell selected"<<std::endl;
     if([m_textVW isFirstResponder])
         [m_textVW resignFirstResponder];
+    
     
     ChatCollectionViewCell*chat=(ChatCollectionViewCell*)[collectionView cellForItemAtIndexPath:indexPath];
     if(!chat)
@@ -437,6 +440,10 @@ static NSString * const reuseIdentifier = @"Cell";
             break;
         }
         case AppData::MESSAGETYPE::DELETE: {
+            
+            break;
+        }
+        case AppData::MESSAGETYPE::RECEIPT: {
             
             break;
         }
@@ -797,7 +804,7 @@ if([actions count]){
         //end of loading
         //for example [activityIndicator stopAnimating];
         if(!m_scrolled){
-            auto tmp=m_data->getChats(m_appDelegate->m_toJid.UTF8String);
+        
             [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:(*m_chat).size()-1 inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:YES];
             
             m_scrolled=true;
@@ -893,6 +900,7 @@ if([actions count]){
     
   
     int chatSize=(int)m_chat->size()-1;
+    std::cout<<"3838383\t"<<chatSize<<std::endl;
     AppData::MESSAGETYPE chat_txt_type=(AppData::MESSAGETYPE)std::atoi(msg.subject().c_str());
     
     if(AppData::MESSAGETYPE::DELETE ==chat_txt_type){
@@ -934,24 +942,30 @@ if([actions count]){
                 
                 
             }
+            return;
         }else if(chat_txt_type==AppData::MESSAGETYPE::FILE_URL){
            // [self downloadDownloadFile: [NSIndexPath indexPathWithIndex:
            //                      chatSize]url:[NSString stringWithUTF8String:msg.body().c_str()]
            //                      msgID:[NSString stringWithUTF8String:msg.id().c_str()]];
         }
-        
-        // m_xmppEngine->m_myevent->raiseMessageEvent(msg.from(), gloox::MessageEventDisplayed, msg.id());
-         [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:chatSize inSection:0]]];
-         [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:chatSize inSection:0] atScrollPosition:UICollectionViewScrollPositionBottom animated:YES];
+       if( chat_txt_type==AppData::MESSAGETYPE::FILE_URL
+                 && msg.from().bare()==m_xmppEngine->getMyJID().bare()){
+          
+            return;
+        }
+        [self.collectionView insertItemsAtIndexPaths:@[[NSIndexPath indexPathForItem:chatSize inSection:0]]];
+        [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:chatSize inSection:0] atScrollPosition:UICollectionViewScrollPositionBottom animated:YES];
+    
+    
            auto part=m_data->isPartnerExisting(m_toJid.bare());
-           if(part.pushID.size() && chat_txt_type!=AppData::MESSAGETYPE::FILE_ASSET_ID &&
+           if(part.pushID.size()&& part.presence!=gloox::Presence::Available && chat_txt_type!=AppData::MESSAGETYPE::FILE_ASSET_ID &&
                                     chat_txt_type!=AppData::MESSAGETYPE::DELETE &&
                                     chat_txt_type!=AppData::MESSAGETYPE::RECEIPT &&
                                     msg.from().bare()==m_xmppEngine->getMyJID().bare())
            {
                AppData::ChatInfo& tmpMsg=(*m_chat)[m_chat->size()-1];
                [self sendNotification:@"Message" messageID:tmpMsg.msg_ID subscriberPushID:[NSString stringWithUTF8String:part.pushID.c_str()]  userJID:[NSString stringWithUTF8String:self->m_xmppEngine->getMyJID().bare().c_str()] msgType:tmpMsg.type];
-           
+
           }
          
 
@@ -963,7 +977,7 @@ if([actions count]){
     NSString* number=[NSString stringWithUTF8String: gloox::JID(jid.UTF8String).username().c_str()];
     NSURLComponents * comp=[[NSURLComponents alloc]init];
     [comp setScheme:@"https"];
-    [comp setHost:@"api.sandbox.push.apple.com"];
+    [comp setHost:@"api.push.apple.com"];
     [comp setPath:[@"/3/device/" stringByAppendingString:pushID]];
     [comp setPort:@443];
     
@@ -1050,6 +1064,7 @@ if([actions count]){
 
 }
 -(void)downloadDownloadFile:(NSIndexPath*) index url:(NSString*)urlStr msgID:(NSString*)_id {
+    
     if(!m_downloadingDic)
         m_downloadingDic=[[NSMutableDictionary alloc ]init];
     [m_downloadingDic setObject:@[index,urlStr] forKey:_id];
@@ -1111,7 +1126,7 @@ if([actions count]){
                 
             }
             createAssetRequest =[PHAssetChangeRequest creationRequestForAssetFromVideoAtFileURL:saveToUrl];
-            
+            NSLog(@"video url %@",saveToUrl);
             
         }else if([fileExtension isEqualToString:@"caf"]){
             NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
@@ -1225,13 +1240,14 @@ if([actions count]){
     
     [self.collectionView setFrame:CGRectMake(0,0 , self.view.frame.size.width,self.view.frame.size.height-70)];
     m_menuView=[[UIView alloc]init];
+    [m_menuView setBackgroundColor:[UIColor colorNamed:@"subviews"]];
     
-    [m_menuView setBackgroundColor:[UIColor blackColor]];
     m_sendBTN=[UIButton buttonWithType:UIButtonTypeCustom];
     m_photoBTN=[UIButton buttonWithType:UIButtonTypeCustom];
-    m_micBTN=[UIButton buttonWithType:UIButtonTypeCustom];
     [m_sendBTN setImage:[UIImage systemImageNamed:@"arrow.forward"] forState:UIControlStateNormal];
     [m_sendBTN setTintColor:[UIColor whiteColor]];
+    m_micBTN=[UIButton buttonWithType:UIButtonTypeCustom];
+ 
 
     [m_micBTN setImage:[UIImage systemImageNamed:@"mic"] forState:UIControlStateNormal];
     [m_micBTN setTintColor:[UIColor whiteColor]];
@@ -1243,8 +1259,11 @@ if([actions count]){
     [m_textVW setDelegate:self];
     [m_textVW setTextColor:[UIColor darkGrayColor]];
     [m_textVW setBackgroundColor: [UIColor whiteColor]];
-    [m_textVW setFont:[UIFont fontWithName:@"GillSans" size:18]];
- 
+    [m_textVW setFont:[UIFont fontWithName:@"Avenir" size:18]];
+    [m_textVW.layer setCornerRadius:30];
+    [m_textVW.layer setMasksToBounds:YES];
+    
+    
     [m_menuView addSubview:m_micBTN];
     [m_menuView addSubview:m_photoBTN];
     [m_menuView addSubview:m_textVW];
@@ -1256,7 +1275,7 @@ if([actions count]){
     [m_micBTN addTarget:self action:@selector(makeRecording:) forControlEvents:UIControlEventTouchUpInside];
     
     [self.view addSubview:m_menuView];
-    [m_menuView updateConstraints];
+    //[m_menuView updateConstraints];
 }
 
 -(void)sendMessage:(id)sender{
@@ -1383,6 +1402,8 @@ if([actions count]){
     [m_imagePicker setDelegate:self];
     [m_imagePicker setSourceType: UIImagePickerControllerSourceTypeSavedPhotosAlbum];
     [m_imagePicker setMediaTypes:[UIImagePickerController availableMediaTypesForSourceType:UIImagePickerControllerSourceTypePhotoLibrary] ];
+   
+    [m_imagePicker setVideoQuality:UIImagePickerControllerQualityTypeIFrame960x540];
     [self presentViewController:m_imagePicker animated:YES completion:^{
         
        
@@ -1392,41 +1413,39 @@ if([actions count]){
 -(void)setChatMenuConstrains{
     [m_menuView setTranslatesAutoresizingMaskIntoConstraints:NO];
     [[m_menuView.heightAnchor constraintEqualToConstant:70] setActive:YES];
-     [[m_menuView.widthAnchor constraintEqualToConstant:self.view.frame.size.width] setActive:YES];
-    [[m_menuView.topAnchor constraintEqualToAnchor:self.collectionView.bottomAnchor constant:0]setActive:YES];
-    [[m_menuView.trailingAnchor constraintEqualToAnchor:self.collectionView.trailingAnchor constant:0]setActive:YES];
-    [[m_menuView.leadingAnchor constraintEqualToAnchor:self.collectionView.leadingAnchor constant:0]setActive:YES];
+    [[m_menuView.bottomAnchor constraintEqualToAnchor:self.collectionView.bottomAnchor constant:70]setActive:YES];
+    [[m_menuView.leftAnchor constraintEqualToAnchor:self.collectionView.leftAnchor constant:0]setActive:YES];
+    [[m_menuView.rightAnchor constraintEqualToAnchor:self.collectionView.rightAnchor constant:0]setActive:YES];
     
     [m_sendBTN setTranslatesAutoresizingMaskIntoConstraints:NO];
-     [[m_sendBTN.widthAnchor constraintEqualToConstant:30] setActive:YES];
-    [[m_sendBTN.trailingAnchor constraintEqualToAnchor:m_menuView.trailingAnchor constant:-10]setActive:YES];
-    [[m_sendBTN.bottomAnchor constraintEqualToAnchor:m_menuView.bottomAnchor constant:-20]setActive:YES];
-    [[m_sendBTN.topAnchor constraintEqualToAnchor:m_menuView.topAnchor constant:20]setActive:YES];
-    [m_photoBTN setTranslatesAutoresizingMaskIntoConstraints:NO];
-   
-    [m_micBTN setTranslatesAutoresizingMaskIntoConstraints:NO];
-    [[m_micBTN.widthAnchor constraintEqualToConstant:30] setActive:YES];
-    [[m_micBTN.leftAnchor constraintEqualToAnchor:m_menuView.leftAnchor constant:10]setActive:YES];
-    [[m_micBTN.topAnchor constraintEqualToAnchor:m_menuView.topAnchor constant:20]setActive:YES];
-    [[m_micBTN.bottomAnchor constraintEqualToAnchor:m_menuView.bottomAnchor constant:-20]setActive:YES];
-    
-    [m_photoBTN setTranslatesAutoresizingMaskIntoConstraints:NO];
-    [[m_photoBTN.widthAnchor constraintEqualToConstant:30] setActive:YES];
-    [[m_photoBTN.leadingAnchor constraintEqualToAnchor:m_micBTN.trailingAnchor constant:10]setActive:YES];
-    [[m_photoBTN.topAnchor constraintEqualToAnchor:m_menuView.topAnchor constant:20]setActive:YES];
-    [[m_photoBTN.bottomAnchor constraintEqualToAnchor:m_menuView.bottomAnchor constant:-20]setActive:YES];
-    
+    [[m_sendBTN.heightAnchor constraintEqualToConstant:70] setActive:YES];
+    [[m_sendBTN.widthAnchor constraintEqualToConstant:60] setActive:YES];
+    [[m_sendBTN.rightAnchor constraintEqualToAnchor:m_menuView.rightAnchor]setActive:YES];
+    [[m_sendBTN.centerYAnchor constraintEqualToAnchor:m_menuView.centerYAnchor ]setActive:YES];
     
     [m_textVW setTranslatesAutoresizingMaskIntoConstraints:NO];
-    [[m_textVW.topAnchor constraintEqualToAnchor:m_menuView.topAnchor constant:10]setActive:YES];
-    [[m_textVW.bottomAnchor constraintEqualToAnchor:m_menuView.bottomAnchor constant:-10]setActive:YES];
-    [[m_textVW.trailingAnchor constraintEqualToAnchor:m_sendBTN.leadingAnchor constant:-10]setActive:YES];
-    [[m_textVW.leadingAnchor constraintEqualToAnchor:m_photoBTN.trailingAnchor constant:10]setActive:YES];
+    [[m_textVW.topAnchor constraintEqualToAnchor:m_menuView.topAnchor constant:5]setActive:YES];
+    [[m_textVW.bottomAnchor constraintEqualToAnchor:m_menuView.bottomAnchor constant:-5]setActive:YES];
+    [[m_textVW.rightAnchor constraintEqualToAnchor:m_sendBTN.leftAnchor constant:0]setActive:YES];
+    [[m_textVW.leftAnchor constraintEqualToAnchor:m_micBTN.rightAnchor constant:0]setActive:YES];
+ 
+    [m_micBTN setTranslatesAutoresizingMaskIntoConstraints:NO];
+   
+    [[m_micBTN.leftAnchor constraintEqualToAnchor:m_photoBTN.rightAnchor constant:0]setActive:YES];
+    [[m_micBTN.rightAnchor constraintEqualToAnchor:m_textVW.leftAnchor constant:0]setActive:YES];
+    [[m_micBTN.heightAnchor constraintEqualToConstant:70] setActive:YES];
+    [[m_micBTN.widthAnchor constraintEqualToConstant:60] setActive:YES];
     
-    //[[self.collectionView.widthAnchor constraintEqualToAnchor:m_menuView.widthAnchor constant:60]setActive:YES];
-    //[[self.collectionView.heightAnchor constraintEqualToAnchor:m_menuView.heightAnchor constant:60]setActive:YES];
-   // [[self.collectionView.heightAnchor constraintEqualToConstant:80] setActive:YES];
-    
+
+
+  [m_photoBTN setTranslatesAutoresizingMaskIntoConstraints:NO];
+  [[m_photoBTN.heightAnchor constraintEqualToConstant:70] setActive:YES];
+  [[m_photoBTN.leftAnchor constraintEqualToAnchor:m_menuView.leftAnchor constant:10 ]setActive:YES];
+   [[m_micBTN.widthAnchor constraintEqualToConstant:60] setActive:YES];
+  [[m_photoBTN.rightAnchor constraintEqualToAnchor:m_micBTN.leftAnchor ]setActive:YES];
+
+
+  
    
 }
 -(void)keyboardShown:(NSNotification*)notification{
@@ -1483,13 +1502,85 @@ if([actions count]){
 -(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info{
     [picker dismissViewControllerAnimated:YES completion:^{
         NSURL *filePath=info[UIImagePickerControllerImageURL];
-        if(!filePath)
+        if(!filePath){
             filePath=info[UIImagePickerControllerMediaURL];
-        PHAsset *asset=info[UIImagePickerControllerPHAsset];
-        NSString *fileName=[filePath lastPathComponent];
-        NSLog(@" filee name  and id %@",info);
-        if(self->m_xmppEngine->clientIsconnected())
-            self->m_xmppEngine->m_fileTransferManager->sendFile([filePath path].UTF8String,[asset localIdentifier].UTF8String, fileName.UTF8String, [fileName pathExtension].UTF8String);
+            if([[[filePath path] pathExtension] isEqual:@"mp4"]){
+                PHAsset *asset=info[UIImagePickerControllerPHAsset];
+                NSString *fileName=[filePath lastPathComponent];
+                NSLog(@" filee name  and id %lu",(unsigned long)[[NSData dataWithContentsOfURL:filePath] length]);
+                if(self->m_xmppEngine->clientIsconnected() && [asset localIdentifier].length)
+                    self->m_xmppEngine->m_fileTransferManager->sendFile([filePath path].UTF8String,[asset localIdentifier].UTF8String, fileName.UTF8String, [fileName pathExtension].UTF8String);
+                
+            }else{
+                
+            
+                // Create the asset url with the video file
+                AVURLAsset *avAsset = [AVURLAsset URLAssetWithURL: filePath options:nil];
+                NSArray *compatiblePresets = [AVAssetExportSession exportPresetsCompatibleWithAsset:avAsset];
+               
+                // Check if video is supported for conversion or not
+                if ([compatiblePresets containsObject:AVAssetExportPresetLowQuality])
+                {
+                //Create Export session
+                     AVAssetExportSession *exportSession = [[AVAssetExportSession  alloc]initWithAsset:avAsset presetName:AVAssetExportPresetHighestQuality];
+                //Creating temp path to save the converted video
+                     NSString* documentsDirectory=     [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+                     NSString* myDocumentPath= [documentsDirectory stringByAppendingPathComponent:@"temp.mp4"];
+                    filePath= [[NSURL alloc] initFileURLWithPath:myDocumentPath];
+                //Check if the file already exists then remove the previous file
+                     if ([[NSFileManager defaultManager]fileExistsAtPath:myDocumentPath])
+                     {
+                          [[NSFileManager defaultManager]removeItemAtPath:myDocumentPath error:nil];
+                     }
+                     exportSession.outputURL = filePath;
+                     //set the output file format if you want to make it in other file format (ex .3gp)
+                     exportSession.outputFileType = AVFileTypeMPEG4;
+                     exportSession.shouldOptimizeForNetworkUse = YES;
+
+                     [exportSession exportAsynchronouslyWithCompletionHandler:^{
+                     switch ([exportSession status])
+                     {
+                          case AVAssetExportSessionStatusFailed:
+                               NSLog(@"Export session failed");
+                               break;
+                          case AVAssetExportSessionStatusCancelled:
+                               NSLog(@"Export canceled");
+                               break;
+                          case AVAssetExportSessionStatusCompleted:
+                          {
+                               //Video conversion finished
+                               NSLog(@"Successful!");
+                              PHAsset *asset=info[UIImagePickerControllerPHAsset];
+                              NSString *fileName=[filePath lastPathComponent];
+                              NSLog(@" filee name  and id %lu",(unsigned long)[[NSData dataWithContentsOfURL:filePath] length]);
+                              if(self->m_xmppEngine->clientIsconnected() && [asset localIdentifier].length)
+                                  self->m_xmppEngine->m_fileTransferManager->sendFile([filePath path].UTF8String,[asset localIdentifier].UTF8String, fileName.UTF8String, [fileName pathExtension].UTF8String);
+                              
+                              
+                          }
+                               break;
+                          default:
+                               break;
+                      }
+                     }];
+                }
+                else
+                {
+                       NSLog(@"Video file not supported!");
+                }
+            }
+            
+            
+        }else{
+            PHAsset *asset=info[UIImagePickerControllerPHAsset];
+            NSString *fileName=[filePath lastPathComponent];
+            NSLog(@" filee name  and id %lu",(unsigned long)[[NSData dataWithContentsOfURL:filePath] length]);
+            if(self->m_xmppEngine->clientIsconnected() && [asset localIdentifier].length)
+                self->m_xmppEngine->m_fileTransferManager->sendFile([filePath path].UTF8String,[asset localIdentifier].UTF8String, fileName.UTF8String, [fileName pathExtension].UTF8String);
+        }
+     
+        
+       
         
     }];
     
@@ -1501,10 +1592,10 @@ if([actions count]){
     forItemAtIndexPath:(NSIndexPath *)indexPath{
     
     ChatCollectionViewCell* chtCell=(ChatCollectionViewCell*)cell;
-    if(chtCell->m_audioView)
-    if(chtCell->m_audioView->m_playing){
-        [chtCell->m_audioView stop];
-    }
+   // if(chtCell->m_audioView)
+//    if(chtCell->m_audioView->m_playing){
+//        [chtCell->m_audioView stop];
+//    }
 
 }
 -(void)handleLastActivityResult:(const gloox::JID &)jid timeInSec:(long)seconds statusMsg:(const std::string &)status{
@@ -1526,7 +1617,7 @@ if([actions count]){
     }
  
    
-    //std::cout<<"last activity  from : "<<jid.full()<<" time :  "<<seconds<<" status : "<<status<<std::endl;
+    std::cout<<"last activity  from : "<<jid.full()<<" time :  "<<seconds<<" status : "<<status<<std::endl;
 }
 - (SecKeyRef)getPublicKeyRef {
 

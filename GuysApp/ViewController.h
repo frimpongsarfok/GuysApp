@@ -19,6 +19,7 @@
 @class ChatsViewController;
 @class ShareTableViewController;
 @class ContactViewController;
+@class AccountViewController;
 @interface ViewController : UIViewController< UISearchBarDelegate,UITableViewDelegate,UITableViewDataSource,XmppProtocol,NSURLConnectionDelegate,_AppDelegate,CNContactPickerDelegate,NSURLSessionDelegate>{
     XmppEgine *m_xmppEngine;
     UIAlertController * m_actionSheet;
@@ -41,13 +42,15 @@
     UILongPressGestureRecognizer *m_deletePartnerGest;
     NSMutableArray *m_sendingFileInfos;
     NSMutableArray *m_msgID4TagNotifRef;// this area store message ID from notification for newMessageTagView() not to show to prevent duplicate Notification
- 
+    UIImageView *m_chatIcon;
   
     NSString *m_newDeviceToken;
+  
     std::tuple<BOOL,std::string>m_isSearchForVCard;
 @public
     id<ChatViewDelegate> m_chatDelegate;
     id<ChatShareDelegate>m_chatShareDelegate;
+    id<AccountViewDelegate>m_accountDelegate;
 }
 
 
@@ -70,7 +73,7 @@
 -(void)setChatDelegate:(id<ChatViewDelegate>)delegate;
 -(BOOL)storeMessage:(NSString*)_id  message:(NSString *)msg  toJIDBare:(NSString*) to fromJIDBare:(NSString*) from  textType:(AppData::MESSAGETYPE) txt_type;
 -(NSString*)getInternationalNumber:(NSString*)number callingCode:(NSString *)code;
-
+-(void)setAcountViewConDelegate:(id<AccountViewDelegate>) delegate;
 @end
 
 
@@ -82,12 +85,13 @@
 @interface PartnerTableViewCell : UITableViewCell{
 @public
     UIImageView * m_photos;
-    UITextView  * m_comment;
+    UIView *m_backgroundView;
     UILabel * m_name;
   
     std::string m_jid;
     UIView *m_presenceColor;
     UILabel *m_msgeBadge;
+    
 
 }
 

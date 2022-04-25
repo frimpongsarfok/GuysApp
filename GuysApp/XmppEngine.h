@@ -16,8 +16,7 @@
 #include "HttpFileUpload.hpp"
 #include <chrono>
 #include <tuple>
-
-#include <gloox/pubsub.h>
+#import <gloox/tag.h>
 #include <gloox/pubsubresulthandler.h>
 class MyVCard:public gloox::VCard{
     static gloox::VCard *m_vcard;
@@ -48,6 +47,8 @@ public:
 
      
 };*/
+
+
 class XmppEgine:public gloox::ConnectionListener,
    gloox::LogHandler,
 gloox::RosterListener,
@@ -70,6 +71,8 @@ gloox::PubSub::ResultHandler
   
     
     gloox::PrivacyManager *m_privacyManager;
+    gloox::PrivacyListHandler::PrivacyList m_partnerBlockList;
+    
     std::thread connectionThread;
     gloox::PubSub::Manager *m_pubsubMang;
     gloox::Presence m_presence;
@@ -113,12 +116,15 @@ gloox::PubSub::ResultHandler
         int size;
         std::string type;
     };
+    
     void setIpNPort(const std::string& msg);
     std::string m_server;
     
    
     gloox::Parser *m_parser;
     dispatch_queue_t m_connectThread;
+    
+    
 public:
     typedef std::tuple<gloox::MessageSession*,gloox::MessageEventFilter*/*null because it is deprecate from  XMPP */,gloox::ChatStateFilter*>  MessageSessionInfoType;
     typedef std::vector<MessageSessionInfoType> MessageSessionType;
@@ -129,6 +135,10 @@ public:
 
       MessageSessionType m_sessions;
   
+    //pubsub
+    
+    enum PUBSUB_NOTI_TYPE{PROFILE_UPDATE=1};
+
     void disconnect(){
         try {
             if(m_client){
@@ -144,7 +154,7 @@ public:
                 return;
             }
         } catch (std::exception ex) {
-            //std::cout<<"Disconnect excep:"<<ex.what()<<std::endl;
+            std::cout<<"Disconnect excep:"<<ex.what()<<std::endl;
         }
 
        
@@ -152,6 +162,52 @@ public:
     }
     
     //Privacy
+    void addPartnertoPrivacyList(gloox::JID){
+        
+    }
+    void blockPartner(gloox::JID jid){
+        if(clientIsconnected() && m_privacyManager){
+            gloox::PrivacyItem item(gloox::PrivacyItem::TypeJid,gloox::PrivacyItem::ActionDeny,gloox::PrivacyItem::PacketAll,jid.bare());
+            m_partnerBlockList.remove_if([jid](gloox::PrivacyItem item){
+                return item.value()==jid.bare();
+            });
+            m_partnerBlockList.push_back(item);
+            m_privacyManager->store("PartnerBlockedList",m_partnerBlockList);
+        }
+      
+    }
+    void unblockPartner(gloox::JID jid){
+        if(clientIsconnected() && m_privacyManager){
+            gloox::PrivacyItem item(gloox::PrivacyItem::TypeJid,gloox::PrivacyItem::ActionAllow,gloox::PrivacyItem::PacketAll,jid.bare());
+            m_partnerBlockList.remove_if([jid](gloox::PrivacyItem item){
+                return item.value()==jid.bare();
+            });
+            m_partnerBlockList.push_back(item);
+            m_privacyManager->store("PartnerBlockedList",m_partnerBlockList);
+        }
+      
+    }
+    void getServerBlockedPartList(){
+        m_privacyManager->requestList("PartnerBlockedList");
+    }
+    std::vector<gloox::PrivacyItem> getPartnerBlockList(){
+        std::vector<gloox::PrivacyItem> list={};
+        for(gloox::PrivacyItem item:m_partnerBlockList){
+            if(item.action()==gloox::PrivacyItem::ActionDeny){
+                list.push_back(item);
+            }
+        }
+        return list;
+    
+    }
+    bool isPartnerBlocked(gloox::JID jid){
+        for(gloox::PrivacyItem item:m_partnerBlockList){
+            if(jid.bare()==item.value() && item.action()==gloox::PrivacyItem::ActionDeny){
+                return true;
+            }
+        }
+        return false;
+    }
     virtual void    handlePrivacyListNames (const std::string &active, const std::string &def, const gloox::StringList &lists);
     
     virtual void    handlePrivacyList (const std::string &name, const gloox::PrivacyListHandler::PrivacyList &items);
@@ -164,7 +220,45 @@ public:
 
     
   //Pubsub
-     
+    
+    const  gloox::JID getPubsubNotificationServiceName(){
+        return gloox::JID("pubsub."+getMyJID().server());
+    }
+    const std::string getPubsubNodeName(){
+        return  std::string("notification_node_"+getMyJID().username());
+    }
+     void getPartnerNodeConfig(const gloox::JID jid){
+        m_pubsubMang->getNodeConfig(getPubsubNotificationServiceName(),"notification_node_"+jid.username(), this);
+    }
+
+    void createNotificationNode(){
+        if(!m_pubsubMang  || !clientIsconnected())return;
+        gloox::DataForm *m_notiNodeConfigForm=new gloox::DataForm(gloox::FormType::TypeSubmit);
+        m_notiNodeConfigForm->addField(gloox::DataFormField::TypeBoolean,"pubsub#presence_based_delivery","1");
+        m_notiNodeConfigForm->addField(gloox::DataFormField::TypeTextSingle,"pubsub#max_items","1");
+        m_pubsubMang->createNode(getPubsubNotificationServiceName(), getPubsubNodeName(), m_notiNodeConfigForm, this);
+    }
+    void subscribToNodeItemNoti(gloox::JID jid){
+        if(m_pubsubMang && clientIsconnected())
+            m_pubsubMang->subscribe(getPubsubNotificationServiceName(), "notification_node_"+jid.username(), this,gloox::JID(),gloox::PubSub::SubscriptionItems);
+    }
+    void publishNotification(PUBSUB_NOTI_TYPE type, std::string title={}, std::string content={}){
+        if(!m_pubsubMang)return;
+         gloox::Tag *itemTag=new gloox::Tag("notification");
+        itemTag->addAttribute("type" ,type);
+        itemTag->addAttribute("jid" ,getMyJID().bare());
+        new  gloox::Tag(itemTag,"title",title);
+        new gloox::Tag(itemTag,"content",content);
+        gloox::PubSub::Item *item=new gloox::PubSub::Item();
+        item->setPayload(itemTag);
+        gloox::PubSub::ItemList list;
+        list.push_back(item);
+        std::cout<<" publish item -> "<<item->payload()->xml()<<std::endl;
+        
+        m_pubsubMang->publishItem(getPubsubNotificationServiceName(), getPubsubNodeName(),list, nullptr, this);
+        
+    }
+    
     virtual void     handleItem (const gloox::JID &service, const std::string &node, const gloox::Tag *entry);
      
     virtual void     handleItems (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::PubSub::ItemList &itemList, const gloox::Error *error=0);
@@ -186,6 +280,7 @@ public:
     virtual void     handleSubscribersResult (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::PubSub::SubscriberList *list, const gloox::Error *error=0);
      
     virtual void     handleAffiliates (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::PubSub::AffiliateList *list, const gloox::Error *error=0);
+    
      
     virtual void     handleAffiliatesResult (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::PubSub::AffiliateList *list, const gloox::Error *error);
      
@@ -484,7 +579,10 @@ public:
             }
             m_parser=nullptr;
 
-                  
+        if( m_privacyManager){
+            delete m_privacyManager;
+            m_privacyManager=nullptr;
+        }
             
            //if(m_myevent)
              //  delete  m_myevent;
@@ -527,8 +625,8 @@ public:
                // delete m_client;
                // m_client=nullptr;
             }
-                
-                //std::cout<<"xmppEngine deleted"<<std::endl;
+       
+                std::cout<<"xmppEngine deleted"<<std::endl;
         
                
             

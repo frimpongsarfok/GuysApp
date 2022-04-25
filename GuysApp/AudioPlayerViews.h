@@ -13,20 +13,24 @@ NS_ASSUME_NONNULL_BEGIN
 @interface AudioPlayerViews : UIView<AVAudioPlayerDelegate>{
     AVAudioPlayer* m_player;
     UIButton *m_play;
-    UIButton *m_stop;
+  
    // UIButton *m_pause;
     UISlider *m_sliderView;
     NSTimer *m_timer;
+
+    AVAudioSession* m_audoSession;
+  
+    
 @public
       BOOL m_playing;
    
 }
 
 
--(instancetype)initWithFrame:(CGRect)frame filePath:(NSString*)path;
 -(void)playNpause;
--(void)stop;
+
 //-(void)pause;
+-(void)setfilePath:(NSString*)path;
 @end
 
 NS_ASSUME_NONNULL_END

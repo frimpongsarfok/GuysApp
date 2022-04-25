@@ -26,6 +26,7 @@ int result;
 @synthesize m_callingCode;
 @synthesize cntryCodePicker;
 @synthesize m_delete_account;
+@synthesize m_mainView;
 @synthesize m_log;
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -70,6 +71,10 @@ int result;
       //  [m_delete_account setHidden:YES];
    // }
     
+    m_mainView.layer.masksToBounds = NO;
+    m_mainView.layer.shadowOffset = CGSizeZero;
+    m_mainView.layer.shadowRadius = 5;
+    m_mainView.layer.shadowOpacity =1;
 
    
 }
@@ -241,7 +246,7 @@ int result;
     [codeTast resume];
 */
     } catch (std::exception ex) {
-        //std::cout<<ex.what()<<std::endl;
+        std::cout<<ex.what()<<std::endl;
     }catch(NSException *objex){
         NSLog(@"Create Account Exep :%@",[objex description]);
     }
@@ -262,15 +267,15 @@ int result;
     
 
 
-        //std::cout<<"result : "<<regResult<<std::endl;
+        std::cout<<"result : "<<regResult<<" jis "<<from.username()<<std::endl;
         if(regResult==0 || regResult==2){
             
                 if(self->m_data){
                    // std::string token=std::get<3>(self->m_data->getUserInfo());
-                    
-                    self->m_data->dropUserData();
+                    self->m_data->dropUserData(true);
                     self->m_data->setAccount(std::string(self->m_currentCallingCode)+std::string(self->m_number+"@www.guysapp.net"),"","", std::string(self->m_currentCallingCode),"","");
-                    
+                                        
+                    //if(m_data->getUserInfo().JID!=gloox::JID())
                     m_xmppEngine->disconnect();
                  /* REGISTER NEW DEVICE TOKEN
                     NSString * oldToken=[NSString stringWithUTF8String:std::get<3>(self->m_data->getUserInfo()).c_str()];
@@ -278,7 +283,7 @@ int result;
                       [self registerDevice:self->m_delegate->m_deviceToken subscriber:[NSString stringWithUTF8String:std::get<0>(self->m_data->getUserInfo()).c_str()]];
                         if([self->m_delegate->m_deviceToken length])
                             self->m_data->setDeviceToken(std::string(self->m_delegate->m_deviceToken.UTF8String));
-                }else if(![oldToken isEqualToString:self->m_delegate->m_deviceToken]){
+                    }else if(![oldToken isEqualToString:self->m_delegate->m_deviceToken]){
                   
                         //REMOVE OLD DEVICE TOKEN
                        // [self unregisterDevice:oldToken subscriber:[NSString stringWithUTF8String:std::get<0>(self->m_data->getUserInfo()).c_str()]];
@@ -299,7 +304,8 @@ int result;
                 //[self.tabBarController setHidesBottomBarWhenPushed:NO];
                 //[self.navigationController pushViewController:viewController animated:YES];
         
-            [self removeFromParentViewController];
+            //[(ViewController*)[self parentViewController] viewDidLoad];
+             [self removeFromParentViewController];
            
             //});
             
@@ -319,7 +325,7 @@ int result;
 
         
     } catch (std::exception excpp) {
-        //std::cout<<"registration result err: "<<excpp.what()<<std::endl;
+        std::cout<<"registration result err: "<<excpp.what()<<std::endl;
     }
     catch(NSException *exobjc){
         NSLog(@"%@",[exobjc description]);
@@ -328,11 +334,11 @@ int result;
 }
 
 -(void)handleDataForm:(const gloox::JID &)from dataForm:(const gloox::DataForm &)form{
-    //std::cout<<"registration datafields received"<<std::endl;
+    std::cout<<"registration datafields received"<<std::endl;
 }
 
 -(void)handleRegistrationFields:(const gloox::JID &)jid Fields:(int)fields Instruction:(std::string)instruction{
-     //std::cout<<"registration fields received"<<std::endl;
+     std::cout<<"registration fields received"<<std::endl;
    
     m_xmppEngine->registerAccount(m_currentCallingCode+m_number,m_currentCallingCode+m_number);
 }
@@ -341,7 +347,7 @@ int result;
 -(void)connected{
     
     if(m_xmppEngine){
-        //std::cout<<"connect : "<<std::endl;
+        std::cout<<"connect : "<<std::endl;
       if(self->m_xmppEngine->registrationMode)
              m_xmppEngine->fetchFields();
     }
@@ -349,7 +355,7 @@ int result;
 
    
 -(void)handleLog:(NSString *)message{
-    //std::cout<<[message UTF8String]<<std::endl;
+    std::cout<<[message UTF8String]<<std::endl;
 }
 
 -(NSMutableArray*)countryCodes{
@@ -366,13 +372,25 @@ int result;
 }
 -(void)onDisconnect:(gloox::ConnectionError)e{
       
+    if([NSThread  isMainThread]){
+        
+    }else{
+        dispatch_sync(dispatch_get_main_queue(), ^{
+            
+        });
+    }
+    
+    if(m_data->getUserInfo().JID!=gloox::JID()){
         [self->m_delegate->m_viewControllar viewDidLoad];
-       
-        [self  dismissViewControllerAnimated:YES completion:^{
-      
-        }];
+           
+            [self  dismissViewControllerAnimated:YES completion:^{
+          
+            }];
+    }
+    
    
  
 }
+
 
 @end

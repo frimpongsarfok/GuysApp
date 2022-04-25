@@ -43,6 +43,13 @@
 				<key>NSTemporaryExceptionMinimumTLSVersion</key>
 				<string>TLSv1.1</string>
 			</dict>
+			<key>New Exception Domain</key>
+			<dict>
+				<key>NSExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+			</dict>
 			<key>www.guysapp.net</key>
 			<dict>
 				<key>NSExceptionAllowsInsecureHTTPLoads</key>
@@ -85,7 +92,7 @@
 	<key>UIStatusBarHidden</key>
 	<true/>
 	<key>UIStatusBarStyle</key>
-	<string>UIStatusBarStyleDefault</string>
+	<string>UIStatusBarStyleDarkContent</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

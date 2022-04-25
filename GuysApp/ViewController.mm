@@ -29,11 +29,15 @@
    if(!self)
 	  return self;
  
+   m_backgroundView=[[UIView alloc]init];
+   [self addSubview:m_backgroundView];
    self->m_photos=[[UIImageView alloc] init];
-   [m_photos setTintColor:[UIColor whiteColor]];
-   m_photos.contentMode=UIViewContentModeScaleAspectFit;
-   
-   self->m_comment=[[UITextView alloc]init];
+   m_photos.layer.masksToBounds=YES;
+   [m_photos setImage:[UIImage systemImageNamed:@"person.fill"]];
+   m_photos.layer.cornerRadius=45;
+   m_photos.contentMode=UIViewContentModeScaleAspectFill;
+   [m_photos setTintColor: [UIColor colorWithRed:0.07 green:0.07 blue:.15 alpha:1]];
+   [m_photos setBackgroundColor: [UIColor darkGrayColor]];
    self->m_name=[[UILabel alloc]init];
    m_msgeBadge=[[UILabel alloc]init];
    // [self->m_photos setUserInteractionEnabled:YES];
@@ -42,54 +46,54 @@
 
    [m_msgeBadge  setFont:[UIFont boldSystemFontOfSize:15]];
    
-
+   self.layer.masksToBounds = NO;
+   self.layer.shadowOffset = CGSizeZero;
+   self.layer.shadowRadius = 5;
+   self.layer.shadowOpacity =1;
    
-  
     
    self->m_photos.translatesAutoresizingMaskIntoConstraints=NO;
-   ///[m_photos setAutoresizesSubviews:NO];
-  
-
-  self->m_name.translatesAutoresizingMaskIntoConstraints=NO;
-   [m_name setAlpha:.5];
-  // self->m_comment.translatesAutoresizingMaskIntoConstraints=NO;
-   self->m_msgeBadge.translatesAutoresizingMaskIntoConstraints=NO;
-   [m_name addSubview:m_msgeBadge];
    
-[self addSubview:m_photos];
-   [m_photos setBackgroundColor: [UIColor darkGrayColor]];
-[m_photos addSubview:m_name];
+   self->m_name.translatesAutoresizingMaskIntoConstraints=NO;
+   m_backgroundView.translatesAutoresizingMaskIntoConstraints=NO;
+   self->m_msgeBadge.translatesAutoresizingMaskIntoConstraints=NO;
+   
+   [m_backgroundView addSubview:m_photos];
+   [m_backgroundView addSubview:m_name];
+   [m_backgroundView addSubview:m_msgeBadge];
 
 //[self addSubview:m_comment];
+   [[m_backgroundView.topAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.topAnchor constant:10] setActive:YES];
+   [[m_backgroundView.bottomAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.bottomAnchor constant:-10] setActive:YES];
+   [[m_backgroundView.leadingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.leadingAnchor constant:10] setActive:YES];
+   [[m_backgroundView.trailingAnchor constraintEqualToAnchor:self.safeAreaLayoutGuide.trailingAnchor constant:-10] setActive:YES];
    
-   [[m_photos.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:25] setActive:YES];
-   [[m_photos.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-25] setActive:YES];
-   [[m_photos.topAnchor constraintEqualToAnchor:self.topAnchor constant:10] setActive:YES];
-   [[m_photos.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-10] setActive:YES];
+   [[m_photos.rightAnchor constraintEqualToAnchor:m_backgroundView.rightAnchor constant:-25] setActive:YES];
+   [[m_photos.heightAnchor constraintEqualToConstant:90] setActive:YES];
+   [[m_photos.widthAnchor constraintEqualToConstant:90] setActive:YES];
+   [[m_photos.centerYAnchor constraintEqualToAnchor:m_backgroundView.centerYAnchor ] setActive:YES];
  
  
    
    NSArray<NSLayoutConstraint*> * nameConstrains=[[NSArray<NSLayoutConstraint*> alloc]initWithObjects:
-												  [m_name.topAnchor constraintEqualToAnchor:m_photos.topAnchor constant:120],
-												  [m_name.bottomAnchor constraintEqualToAnchor:m_photos.bottomAnchor constant:0],
-												 // [m_name.widthAnchor constraintEqualToAnchor:m_photos.widthAnchor],
-												  [ m_name.trailingAnchor constraintEqualToAnchor:m_photos.trailingAnchor constant:0],
-												  [ m_name.leadingAnchor constraintEqualToAnchor:m_photos.leadingAnchor constant:0],
+												  [m_name.topAnchor constraintEqualToAnchor:m_backgroundView.topAnchor constant:20],
+												  [m_name.leadingAnchor constraintEqualToAnchor:m_backgroundView.leadingAnchor constant:15],
+						   
+												  [ m_name.trailingAnchor constraintEqualToAnchor:m_backgroundView.trailingAnchor constant:-120],
+												 
 												  nil];
     [NSLayoutConstraint activateConstraints:nameConstrains];
-   
-   
-   NSArray<NSLayoutConstraint*> * msgbadgeConstrains=[[NSArray<NSLayoutConstraint*> alloc]initWithObjects:
-													  [m_msgeBadge.topAnchor constraintEqualToAnchor:m_name.topAnchor constant:35] ,
-													  [m_msgeBadge.bottomAnchor constraintEqualToAnchor:m_name.bottomAnchor constant:-10],
-													  // [m_msgeBadge.leadingAnchor constraintEqualToAnchor:m_name.leadingAnchor constant:250] ,
-													  [m_msgeBadge.trailingAnchor constraintEqualToAnchor:m_name.trailingAnchor constant:-30],
-													  nil];
-   
-   
 
-   [NSLayoutConstraint activateConstraints:msgbadgeConstrains];
-  // m_photos add
+
+   NSArray<NSLayoutConstraint*> * msgbadgeConstrains=[[NSArray<NSLayoutConstraint*> alloc]initWithObjects:
+													  [m_msgeBadge.bottomAnchor constraintEqualToAnchor:m_backgroundView.bottomAnchor constant:-10],
+													  [m_msgeBadge.leftAnchor constraintEqualToAnchor:m_backgroundView.leftAnchor constant:30],
+													  nil];
+
+
+
+  [NSLayoutConstraint activateConstraints:msgbadgeConstrains];
+//  // m_photos add
 
    //[m_name setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:.8]];
   /// [self setBackgroundColor:[UIColor clearColor]];
@@ -101,32 +105,19 @@
 
   // [m_photos setBackgroundColor:[UIColor colorWithRed:1 green:1 blue:1 alpha:.7]];
  
-   [m_name setTextAlignment:NSTextAlignmentCenter];
-   [m_name  setTextColor:[UIColor blackColor]];
-   [m_name  setBackgroundColor:[UIColor whiteColor]];
-   [m_name   setFont:[UIFont fontWithName:@"GillSans-Semibold" size:30]];
-  
-   
-
-   
-   
+   [m_name setTextAlignment:NSTextAlignmentLeft];
+   [m_name  setTextColor:[UIColor whiteColor]];
+   [m_name   setFont:[UIFont fontWithName:@"Avenir-Medium" size:30]];
    m_msgeBadge.layer.cornerRadius=5;
    m_msgeBadge.layer.masksToBounds=YES;
   
    self.selectionStyle=UITableViewCellSelectionStyleNone;
-   self.backgroundColor=[UIColor blackColor];
+   [self setBackgroundColor:[UIColor clearColor]];
+   m_backgroundView.backgroundColor=[UIColor colorNamed:@"main_view"];
 
     //m_photos.contentMode = UIViewContentModeScaleAspectFit;
   
-   m_photos.layer.shadowRadius  = 3.5f;
-   m_photos.layer.shadowColor   = [UIColor colorWithRed:176.f/255.f green:199.f/255.f blue:226.f/255.f alpha:1.f].CGColor;
-   m_photos.layer.shadowOffset  = CGSizeMake(0.0f, 0.0f);
-   m_photos.layer.shadowOpacity = 0.9f;
-   m_photos.layer.masksToBounds = NO;
-
-   UIEdgeInsets shadowInsets     = UIEdgeInsetsMake(0, 0, -4.5f, 0);
-   UIBezierPath *shadowPath      = [UIBezierPath bezierPathWithRect:UIEdgeInsetsInsetRect(m_photos.bounds, shadowInsets)];
-   m_photos.layer.shadowPath    = shadowPath.CGPath;
+   
    
    return self;
 }
@@ -156,12 +147,42 @@
 
 -(void)viewWillAppear:(BOOL)animated{
   
+   std::cout<<"view appeeearrr"<<std::endl;
 
    
 	  [[[self tabBarController] tabBar] setHidden:NO];
       // m_chatDelegate=nil;
+   if(m_data->getUserInfo().JID==gloox::JID()){
+	  [self setAccount];
+	  return;
+   }
    [m_rosterTableView reloadData];
+  
+		 [self displayChatIcon];
+  
 
+}
+-(void)displayChatIcon{
+  
+   if(!m_chatIcon){
+	  m_chatIcon=[[UIImageView alloc]initWithImage:[UIImage imageNamed:@"chatIcon"]];
+	  [self.view addSubview:m_chatIcon];
+	  [m_chatIcon setTranslatesAutoresizingMaskIntoConstraints:NO];
+	  [[[m_chatIcon centerXAnchor] constraintEqualToAnchor:self.view.centerXAnchor] setActive:YES];
+	  [[[m_chatIcon centerYAnchor] constraintEqualToAnchor:self.view.centerYAnchor] setActive:YES];
+	  [[[m_chatIcon widthAnchor] constraintEqualToConstant:300] setActive:YES];
+	  [[[m_chatIcon heightAnchor] constraintEqualToConstant:300] setActive:YES];
+   }
+   long size=m_data->chatRoster().size();
+   if(!size){
+	  [self.view bringSubviewToFront:m_chatIcon];
+	  [m_chatIcon setHidden:NO];
+   }else {
+	  std::cout<<self.restorationIdentifier.UTF8String<<" chats sizee :: "<<size<<std::endl;
+	  [m_chatIcon setHidden:YES];
+   }
+ 
+   
 }
 
 -(void)scanContact{
@@ -262,6 +283,8 @@
    
 }
 -(void)uploadFileToServerURL:(NSString *)urlStr  filePath:(NSString*)path name:(NSString*)name msgID:(NSString*)_id{
+   
+   NSLog(@"uuuuu %@",path);
  
    NSMutableData *body = [NSMutableData data];
    NSURL*url=[NSURL URLWithString:urlStr];
@@ -340,7 +363,7 @@
    }
    for(NSArray* fileSendingInfo in m_sendingFileInfos){
 		 auto fromTo=m_data->getToAndFrom4FileUrlSend([fileSendingInfo[0] UTF8String]);
-		 NSLog(@"finish to: %s - -- -- \t%@",fromTo.second.c_str(), fileSendingInfo);
+		 NSLog(@"finish to:%@| %s - -- -- \t%@",fileSendingInfo[0],fromTo.second.c_str(), fileSendingInfo);
 		 m_data->setFileURLInfo([fileSendingInfo[0] UTF8String],[fileSendingInfo[1] UTF8String]);
 	     m_xmppEngine->sendMessage(XmppEgine::MESSAGETYPE::FILE_URL,[fileSendingInfo[1] UTF8String],[fileSendingInfo[0] UTF8String],m_xmppEngine->getToJID().bare());
    }
@@ -350,7 +373,7 @@
    
 }
 - (void)URLSession:(NSURLSession *)session task:(nonnull NSURLSessionTask *)task didCompleteWithError:(nullable NSError *)error{
-   NSLog(@"eerrrrrrrrr %@\n\n\n\n",error);
+   if(error)NSLog(@"eerrrrrrrrr %@\n\n\n\n",error);
    [task resume];
 }
 
@@ -462,7 +485,7 @@
 			   //update user name if not the same
 			
 			   if(name1!=name2){
-				  //std::cout<<name1<<"\t"<<name2<<std::endl;
+				  std::cout<<name1<<"\t"<<name2<<std::endl;
 				  [self updateNameInTableViewRoster:name1 target:jid];
 			   }
 			   if(!tmpPart.inContact){
@@ -503,7 +526,7 @@
 //						   if(self->m_xmppEngine && self->m_xmppEngine->clientIsconnected()){
 //							  if(self->m_isSearchForVCard==std::tuple<BOOL,std::string>(false,{})){
 //							    self->m_isSearchForVCard={true,part->first};
-//								 ////std::cout<<"fectVcardQues\t"<<part->first<<std::endl;
+//								 //std::cout<<"fectVcardQues\t"<<part->first<<std::endl;
 //								self->m_xmppEngine->fetchVCard(gloox::JID(part->first));
 //								 std::this_thread::sleep_for(std::chrono::milliseconds(300));
 //								 //return;
@@ -530,7 +553,7 @@
 	  
 	 
    } catch (std::exception ex) {
-	  //std::cout<<ex.what()<<std::endl;
+	  std::cout<<ex.what()<<std::endl;
 	//  m_xmppEngine->disconnect();
    }
    
@@ -592,10 +615,7 @@
    [self groupPath];
    
   
-    AVAudioSession *audoSession=  [AVAudioSession sharedInstance];
-   [audoSession setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
-   [audoSession setActive:YES error: nil];
-   
+  
    
    NSLog(@"parent identifiers : %@",self.restorationIdentifier);
    NSLog(@"App is is on active12");
@@ -607,6 +627,7 @@
    m_activityIndicator=[[UIActivityIndicatorView alloc]initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleLarge];
    [m_activityIndicator setHidesWhenStopped: YES];
    m_activityIndicator.center=m_rosterTableView.center;
+   m_rosterTableView.backgroundColor=[UIColor colorNamed:@"main_background"];
    [self.view addSubview:m_activityIndicator];
    [self.view bringSubviewToFront:m_activityIndicator];
 
@@ -633,68 +654,59 @@
 	  
 	  m_appDelegate->m_viewControllar=self;
 	  [m_appDelegate setDelegate: self];
-	  if(self->m_xmppEngine){
-		 delete self->m_xmppEngine;
-		 self->m_xmppEngine=nullptr;
-		 self->m_appDelegate->m_xmppEngine=nil;
-		 
-		
-	  }
    if(!m_appDelegate->m_data){
-		// delete m_data;
-		 //m_data=nullptr;
-		 //m_appDelegate->m_data=nullptr;
 	  m_data=new AppData();
 	  m_data->getChatData();
-	
 	  m_appDelegate->m_data=(void*)m_data;
-		 
-
-	  }
+   }
 	
 	
-	  [self getGroupMessage];
-	  //IF NO JID FOUND SET ACCOUNT
-	  if(!m_data->getUserInfo().JID.bare().size()){
-		 //m_xmppEngine=nullptr
-		// m_appDelegate->m_xmppEngine=(void*)m_xmppEngine;
-		 [self setAccount];
+   [self getGroupMessage];
+   //IF NO JID FOUND SET ACCOUNT
+   if(!m_data->getUserInfo().JID.bare().size()){
+	  //m_xmppEngine=nullptr
+	 // m_appDelegate->m_xmppEngine=(void*)m_xmppEngine;
+	  [self setAccount];
+	  
+   }else{
+	  [m_appDelegate registerPushNotification];
+   }
+	  
+	  std::cout<<"let start agin"<<std::endl;
 		 
-	  }else{
-		 [m_appDelegate registerPushNotification];
-	  }
-		 
-	  //@autoreleasepool {
-		 m_presence=gloox::Presence::Unavailable;
-		 m_xmppEngine=new XmppEgine(self, m_data->getUserInfo().JID.bare() +"/iphone",m_data->getUserInfo().JID.username(),m_server.UTF8String,false);
-		 if(m_appDelegate->m_toJid)
-			m_xmppEngine->setToJId(gloox::JID(m_appDelegate->m_toJid.UTF8String));
-		 m_xmppEngine->setDelegate(self);
-		 m_appDelegate->m_xmppEngine=(void*)m_xmppEngine;
-	 // }
-		
-	  if(m_appDelegate->m_chatControllar){
-		 [m_appDelegate->m_chatControllar viewDidLoad];
+   //@autoreleasepool {
+	  m_presence=gloox::Presence::Unavailable;
+	  m_xmppEngine=new XmppEgine(self, m_data->getUserInfo().JID.bare() +"/iphone",m_data->getUserInfo().JID.username(),m_server.UTF8String,false);
+	  if(m_appDelegate->m_toJid)
+		 m_xmppEngine->setToJId(gloox::JID(m_appDelegate->m_toJid.UTF8String));
+	  m_xmppEngine->setDelegate(self);
+	  m_appDelegate->m_xmppEngine=(void*)m_xmppEngine;
+  // }
+	 
+   if(m_appDelegate->m_chatControllar){
+	  [m_appDelegate->m_chatControllar viewDidLoad];
 	  }
 	  
 		 [m_rosterTableView setDelegate:self];
 		 [m_rosterTableView setDataSource:self];
 		 [m_rosterTableView setAllowsMultipleSelection:NO];
-		 [m_rosterTableView setRowHeight:200];
+		 [m_rosterTableView setRowHeight:130];
 		 [m_rosterTableView setSeparatorStyle: UITableViewCellSeparatorStyleNone];
 		 [m_rosterTableView registerClass:[PartnerTableViewCell self] forCellReuseIdentifier:@"PartnersCell"];
+	 
 	  
-       
+	
 	     
    } catch (std::exception ex) {
-	  //std::cout<<"c++ Exception occurs in viewcontroller : "<<ex.what()<<std::endl;
+	  std::cout<<"c++ Exception occurs in viewcontroller : "<<ex.what()<<std::endl;
    }catch(NSException* objex){
 	  NSLog(@"Objct c Exception occurs in viewcontroller : %@",[objex description]);
    }
    
    
-    
    
+   
+   [self displayChatIcon];
    [super viewDidLoad];
    
 }
@@ -735,22 +747,22 @@
    
 }
 -(void)handleDeletePartner:(UILongPressGestureRecognizer*)recognizer{
-   
- 
    CGPoint p=[recognizer locationInView:m_rosterTableView];
    NSIndexPath *index=[m_rosterTableView indexPathForRowAtPoint:p];
+   PartnerTableViewCell * tmpCell=(PartnerTableViewCell*)recognizer.view;
+   auto tmpPart=self->m_data->isPartnerExisting(tmpCell->m_jid);
+  
    if(index!=nil){
 	  if(recognizer.state==UIGestureRecognizerStateBegan){
 		 //delete partner here...
-		 UIAlertController * deleteAlert=[UIAlertController alertControllerWithTitle:@"Delete Partner" message:nil preferredStyle:UIAlertControllerStyleAlert];
-		 [deleteAlert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+		 UIAlertController * deleteAlert=[UIAlertController alertControllerWithTitle:@"Select Action" message:nil preferredStyle:UIAlertControllerStyleAlert];
+		 [deleteAlert addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
 			
-			PartnerTableViewCell * tmpCell=(PartnerTableViewCell*)recognizer.view;
 			self->m_xmppEngine->removeContact(tmpCell->m_jid);   //delete from online roster
 			self->m_data->deletePartnerFromChat(tmpCell->m_jid);  //delete from chat table
 			self->m_data->setPartnerInRoster(tmpCell->m_jid, NO); //delete from db roster
 			
-		
+			
 			[self->m_rosterTableView beginUpdates];
 			[self->m_rosterTableView deleteRowsAtIndexPaths:@[index] withRowAnimation:UITableViewRowAnimationRight];
 			[self->m_rosterTableView endUpdates];
@@ -759,6 +771,14 @@
 			   if(self->m_chatDelegate)
 				  [self->m_chatDelegate handleChatDeleted];
 			  }
+			[self displayChatIcon];
+		 }]];
+		
+		 [deleteAlert addAction:[UIAlertAction actionWithTitle:tmpPart.blocked?@"Unlock":@"Block" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+			tmpPart.blocked? self->m_xmppEngine->unblockPartner(tmpPart.jid): self->m_xmppEngine->blockPartner(tmpPart.jid);;
+			
+			
+			
 		 }]];
 		 [deleteAlert addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
 			
@@ -821,7 +841,8 @@
 }
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
    NSInteger size=m_data->chatRoster().size();
-         
+   
+   std::cout<<" size now "<<size<<std::endl;
 	  return  size;
    
   
@@ -835,14 +856,22 @@
 	  NSString *name=[NSString stringWithUTF8String:ros[indexPath.row].name.c_str()];;
 	  NSString *number=[NSString stringWithUTF8String:gloox::JID(ros[indexPath.row].jid).username().c_str()];;
 	  cell->m_jid=ros[indexPath.row].jid;
-	  //std::cout<<"%%%%% "<<ros[indexPath.row].name<<" : "<<ros[indexPath.row].jid<<std::endl;
+	  std::cout<<"%%%%% "<<ros[indexPath.row].name<<" : "<<ros[indexPath.row].jid<<std::endl;
 	  
+
+
 	  if([name isEqualToString:@""]){
 		  [cell->m_name setText:number];
 	  }else{
 		  [cell->m_name setText:name];
 	  }
-	
+	  if(m_data->isPartnerExisting(cell->m_jid).blocked){
+		 NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc] initWithString:cell->m_name.text];
+		 [attributeString addAttribute:NSStrikethroughStyleAttributeName
+								 value:@2
+								 range:NSMakeRange(0, [attributeString length])];
+		 [cell->m_name setAttributedText:attributeString];
+	  }
 	 
 	  m_deletePartnerGest=[[UILongPressGestureRecognizer alloc]initWithTarget:self action:@selector(handleDeletePartner:)];
 	  [m_deletePartnerGest setMinimumPressDuration:1];
@@ -857,7 +886,7 @@
 			   [cell->m_photos setImage:[UIImage imageWithData:photo]];
 			
 		 }else{
-			   [cell->m_photos setImage:[UIImage systemImageNamed:@""]];
+			   [cell->m_photos setImage:[UIImage systemImageNamed:@"person.fill"]];
 			
 		 }
 	  }
@@ -911,7 +940,7 @@
 	  }
    }
 	 
-   //std::cout<<"\nself vcard received 2  "<<token<<std::endl;
+   std::cout<<"\nself vcard received 2  "<<token<<std::endl;
    if((card->uid().c_str()!=token) || newDP ||card->jabberid().empty() ){
 	  
 	  m_xmppEngine->storeVCard(tmpVC);
@@ -936,12 +965,12 @@
     if(!vcard->jabberid().size()){
 	   if(std::get<1>(m_isSearchForVCard)==jid.bare()){
 		  self->m_isSearchForVCard={false,{}};
-			////std::cout<<"fectVcardQues+++"<<std::endl;
+			//std::cout<<"fectVcardQues+++"<<std::endl;
 	   }
 	   return;
 	}
    
-   //std::cout<<jid.bare()<<"\tuid : "<<vcard->uid()<<std::endl;
+   std::cout<<jid.bare()<<"\tuid : "<<vcard->uid()<<std::endl;
    self-> m_data->setPartnerRegistered(jid.bare(), true);
    self->m_data->setPartnerPhoto(jid.bare(), vcard->photo().binval);
    if(vcard->uid().size())
@@ -972,14 +1001,11 @@
 		 NSData *photo=[[NSData alloc]initWithBase64EncodedString:p options:0];
 		
 		 [self->m_rosterTableView beginUpdates];
-
 			if(photo){
-			   
 			   [partnerCell->m_photos setImage:[UIImage imageWithData:photo]];
 			}else{
 			   [partnerCell->m_photos setImage:[UIImage systemImageNamed:@""]];
 			}
-			
 		 [self->m_rosterTableView endUpdates];
 		// });
 		 break;;
@@ -993,19 +1019,19 @@
    //}).detach();
    if(std::get<1>(m_isSearchForVCard)==jid.bare()){
 	  self->m_isSearchForVCard={false,{}};
-		////std::cout<<"fectVcardQues+++"<<std::endl;
+		//std::cout<<"fectVcardQues+++"<<std::endl;
    }
 }
 -(void)handleSelfStoreVCardResult:(gloox::StanzaError)error{
-   //std::cout<<"self store result"<<std::endl;
+   std::cout<<"self store result"<<std::endl;
 }
 
 -(void)handleSelfFetchVCardResult:(gloox::StanzaError)error{
-    //std::cout<<"\nself vcard fetched result :"<<error<<std::endl;
+    std::cout<<"\nself vcard fetched result :"<<error<<std::endl;
 
 }
 -(void)handleFetchVCardResult:(gloox::JID)jid StanzaErr:(gloox::StanzaError)se{
-    //std::cout<<"\n vcard fetched result :"<<se<<std::endl;
+    std::cout<<"\n vcard fetched result :"<<se<<std::endl;
   
 }
 
@@ -1013,7 +1039,7 @@
 -(void)handleLastActivityError:(const gloox::JID &)jid errorMsg:(gloox::StanzaError)error{
    
    
-   //std::cout<<"last activity error"<<error<<std::endl;
+   std::cout<<"last activity error"<<error<<std::endl;
    
    
 }
@@ -1024,7 +1050,7 @@
    dateFormatter.timeStyle = NSDateFormatterMediumStyle;
    dateFormatter.dateStyle = NSDateFormatterShortStyle;
    dateFormatter.doesRelativeDateFormatting = YES;
-  // //std::cout<<"last activity :: "<<jid.bare()<<" - : "<<seconds<<" : "<<status<<std::endl;
+  // std::cout<<"last activity :: "<<jid.bare()<<" - : "<<seconds<<" : "<<status<<std::endl;
    if(!seconds){
 	  m_data->setPresence(jid.bare(), gloox::Presence::PresenceType::Available,"0");
    }else{
@@ -1106,7 +1132,7 @@
 //			   std::map<const std::string,gloox::RosterItem*>::iterator it=self->m_xmppEngine->getRoster()->roster()->begin();
 //			BOOL online=it->second->online();
 //			   [self->m_rosterTableView beginUpdates];
-//		   // //std::cout<<"presence from "<<item->jidJID().bare()<<" online :"<<item->online()<<std::endl;
+//		   // std::cout<<"presence from "<<item->jidJID().bare()<<" online :"<<item->online()<<std::endl;
 //			if(online){
 //			   //[cell.m_presenceImg setBackgroundColor:[UIColor redColor]];
 //			    [self->m_presenceView setTitle:@"Online"];
@@ -1198,7 +1224,7 @@
 			 std::string _id=std::get<0>(chat);
 			 switch (type) {
 				case AppData::MESSAGETYPE::TEXT:{
-				   //std::cout<<"mid mdisdiis "<<_id<<std::endl;
+				   std::cout<<"mid mdisdiis "<<_id<<std::endl;
 				   m_xmppEngine->sendMessage(XmppEgine::MESSAGETYPE::TEXT,txt.UTF8String,_id,_to,YES);
 				   
 				   break;
@@ -1213,7 +1239,7 @@
 				   break;
 				}
 				case AppData::MESSAGETYPE::FILE_ASSET_ID:{
-					//std::cout<<4848484848484<<"\t"<<(int)type<<std::endl;
+					std::cout<<4848484848484<<"\t"<<(int)type<<std::endl;
 			       PHFetchResult *result=nil;
 				   PHAsset *assett=nil;
 				   PHImageManager *imageMgr=[PHImageManager defaultManager];
@@ -1353,6 +1379,7 @@
    dispatch_async(dispatch_get_main_queue(), ^{
 	  UIStoryboard * tmpStoryBoard=[UIStoryboard storyboardWithName:@"Main" bundle:nil];
 	  UIViewController* m_createAccountViewController=(UIViewController*) [tmpStoryBoard instantiateViewControllerWithIdentifier:@"CreateAccount"];
+	  [m_createAccountViewController setModalPresentationStyle:UIModalPresentationFullScreen];
 	  //[self.tabBarController setHidesBottomBarWhenPushed:YES];
 	  //[self.navigationController setNavigationBarHidden:YES animated:YES];
 	  [self presentViewController:m_createAccountViewController animated:YES completion:nil];
@@ -1384,22 +1411,25 @@
    if(m_xmppEngine->registrationMode)
 		 return;
    if(e!=gloox::ConnectionError::ConnNoError){
-	  if(e==16){
-		 self->m_data->dropUserData();
-		 [self setAccount];
-	  }
+	
 	
 		 if(self->m_xmppEngine){
 			
 			delete self->m_xmppEngine;
 			self->m_xmppEngine=nullptr;
 			self->m_appDelegate->m_xmppEngine=nil;
-			//[self->m_appDelegate setDelegate:nil];
-		 
-	  if(e!=17){
+		
+		 }
+	  if(e==16 || m_data->getUserInfo().JID==gloox::JID()){
+		 //self->m_data->dropUserData();
+		 [self setAccount];
+		 return;
+	  }
+	  
+	  if(e!=17 && e!=16){
 	  
 		// dispatch_async (dispatch_get_main_queue(), ^{
-			      
+				  
 			self->m_presence=gloox::Presence::Unavailable;
 			self->m_xmppEngine=new XmppEgine(self, self->m_data->getUserInfo().JID.bare() +"/iphone",self->
 											 m_data->getUserInfo().JID.username(),self->m_server.UTF8String,false);
@@ -1410,9 +1440,13 @@
 		 }
 			   ///m_xmppEngine->disconnect();
 		
-	  }
+	  
+	  std::cout<<" connectinon err : "<<e<<std::endl;
    }
  
+   
+}
+-(void)handleRegistrationResult:(const gloox::JID &)from registreationResult:(gloox::RegistrationResult)regResult{
    
 }
 -(void)newMessageTagView:(gloox::JID)jid parentView:(UIView*)pView{
@@ -1495,7 +1529,7 @@
 }
 
 -(void)handleChatState:(const gloox::JID &)from state:(gloox::ChatStateType)state{
-	//std::cout<<"chatssssss sstaaateee from : "<<from.bare()<<" :\t"<<state<<std::endl;
+	std::cout<<"chatssssss sstaaateee from : "<<from.bare()<<" :\t"<<state<<std::endl;
    if(m_chatDelegate && (from.bare()== m_appDelegate->m_toJid.UTF8String)){
 	  [m_chatDelegate handleChatState:from state:state];
 	  
@@ -1535,6 +1569,7 @@
 			}
 			m_data->setPartnerChatPriority((msg.from().bare()==m_xmppEngine->getMyJID().bare()?msg.to().bare():msg.from().bare()));
 			[self shuffleRow:msg.from().bare()==m_xmppEngine->getMyJID().bare()?msg.to().bare():msg.from().bare() preNumOfPart:prevNumOfPart];
+			[self partnerNewMsgCount:msg.from()];
 		 }break;
 		 case AppData::MESSAGETYPE::FILE_URL:{
 		
@@ -1546,11 +1581,12 @@
 			   m_xmppEngine->sendMessage(XmppEgine::MESSAGETYPE::RECEIPT,{}, msgID,msg.from().bare());
 			}else if(m_xmppEngine->clientIsconnected() && msg.from().bare()==m_xmppEngine->getMyJID().bare()){
 			   m_data->setMsgStatus(msg.to().bare(), msgID, gloox::MessageEventOffline);
-
+                    
 			}
+		
 			m_data->setPartnerChatPriority((msg.from().bare()==m_xmppEngine->getMyJID().bare()?msg.to().bare():msg.from().bare())); 
 			[self shuffleRow:msg.from().bare()==m_xmppEngine->getMyJID().bare()?msg.to().bare():msg.from().bare() preNumOfPart:prevNumOfPart];
-		 
+			[self partnerNewMsgCount:msg.from()];
 		 }break;
 		 case AppData::MESSAGETYPE::FILE_ASSET_ID:{
 			[self storeMessage:[NSString stringWithUTF8String:msgID.c_str()]
@@ -1559,7 +1595,7 @@
 							fromJIDBare:_from  textType:chat_txt_type];
 			m_data->setPartnerChatPriority((msg.from().bare()==m_xmppEngine->getMyJID().bare()?msg.to().bare():msg.from().bare()));
 			[self shuffleRow:msg.from().bare()==m_xmppEngine->getMyJID().bare()?msg.to().bare():msg.from().bare() preNumOfPart:prevNumOfPart];
-		 
+			[self partnerNewMsgCount:msg.from()];
 
 		 }break;
 		 case AppData::MESSAGETYPE::WEB_LINK:{
@@ -1570,19 +1606,19 @@
 			m_data->setPartnerChatPriority((msg.from().bare()==m_xmppEngine->getMyJID().bare()?msg.to().bare():msg.from().bare()));
 			[self shuffleRow:msg.from().bare()==m_xmppEngine->getMyJID().bare()?msg.to().bare():msg.from().bare() preNumOfPart:prevNumOfPart];
 		 
-
+			[self partnerNewMsgCount:msg.from()];
 		 }break;
 		 case AppData::MESSAGETYPE::DELETE:{
 			
 			m_data->deleteMessage(msg.from().bare()==m_xmppEngine->getMyJID().bare()?msg.to().bare():msg.from().bare(), msg.body());
 			
-
+			[self partnerNewMsgCount:msg.from()];
 		 }break;
 		 case AppData::MESSAGETYPE::RECEIPT:{
 
 			//set message with msgID delivered if not from you
 			if(msg.from().bare()!=m_xmppEngine->getMyJID().bare()){
-			   //std::cout<<"your message :"<<msg.from().bare()<<"\t has be received your message :"<<msgID<<std::endl;
+			   std::cout<<"your message :"<<msg.from().bare()<<"\t has be received your message :"<<msgID<<std::endl;
 			   m_data->setMsgStatus(msg.from().bare(), msgID, gloox::MessageEventDelivered);
 			}
 
@@ -1593,24 +1629,18 @@
 	  
 	
 	
-	  if(m_appDelegate->m_toJid){
-		 if(msg.from().bare()!=gloox::JID(m_appDelegate->m_toJid.UTF8String).bare()){
-			[self partnerNewMsgCount:msg.from()];
-		 }
-	  }else{
-		 [self partnerNewMsgCount:msg.from()];
-	  }
-   
+	 
 
 	  //when chat open between you and the current chat partner
 	  if(m_appDelegate->m_toJid){
 
 	      std::string toJID=gloox::JID(m_appDelegate->m_toJid.UTF8String).bare();
-		 if((m_chatDelegate && msg.from().bare()==toJID) || (m_chatDelegate && msg.to().bare()==toJID)){
-
+		 if((m_chatDelegate && msg.from().bare()==toJID) ||
+			(m_chatDelegate && msg.to().bare()==toJID) ){
+               
+			
 			   [ m_chatDelegate handleChatMessage:msg session:session];
-
-
+			
 		 }
 		 //toggle sound,vibration and newMsgTagView
 
@@ -1652,7 +1682,7 @@
 	   //  }
 
    } catch (std::exception er) {
-	  //std::cout<<"error reading message receied err : "<<er.what()<<std::endl;
+	  std::cout<<"error reading message receied err : "<<er.what()<<std::endl;
 	  
    }
    
@@ -1664,14 +1694,15 @@
 }
 
 -(void)partnerNewMsgCount:(gloox::JID)jid{
-   for(int row=0;row<m_data->chatRoster().size();row++){
+   int rowSize=(int)m_data->chatRoster().size();
+   for(int row=0;row<rowSize;row++){
 	  PartnerTableViewCell *cell=[m_rosterTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
 	   if(!cell)
 		  continue;
 	  if(gloox::JID(cell->m_jid).bare()==jid.bare()){
 		 [m_rosterTableView beginUpdates];
 		 int numUnread=m_data->getUnreadMsgCount(gloox::JID(cell->m_jid).bare());
-		 //std::cout<<" new message total : "<<numUnread<<std::endl;
+		 std::cout<<" new message total : "<<numUnread<<std::endl;
 		 [cell->m_msgeBadge setText: numUnread?[NSString stringWithFormat:@" %i ",numUnread]:@""];
 		 
 		 [m_rosterTableView endUpdates];
@@ -1684,7 +1715,7 @@
 -(void)handleItemAdded:(const gloox::JID& )jid{
   
    //ADD TO PARTNERS IF  PARTNER NOT EXIST
-   //std::cout<<"handle item add:"<<jid.full()<<std::endl;
+   std::cout<<"handle item add:"<<jid.full()<<std::endl;
    AppData::AppData::PartnerInfoType  part=m_data->isPartnerExisting(jid.bare());
 
    if(part.jid.empty()){
@@ -1716,26 +1747,26 @@
 	  m_xmppEngine->fetchVCard(jid);
 //
 //
-//       // //std::cout<<"Addedss : "<<jid.full() <<"\troster : "<<self->m_data->roster().size()<<std::endl;
+//       // std::cout<<"Addedss : "<<jid.full() <<"\troster : "<<self->m_data->roster().size()<<std::endl;
 //
 //   }
 }
 -(void)handleItemAlreadyExist:(const gloox::JID&)jid{
-   //std::cout<<"Already Exist : "<<jid.full()<<std::endl;
+   std::cout<<"Already Exist : "<<jid.full()<<std::endl;
 }
 
 -(void)handleItemUnsubscribed:(const gloox::JID& )jid{
-   //std::cout<<"item unsubscribed  : "<<jid.full()<<std::endl;
+   std::cout<<"item unsubscribed  : "<<jid.full()<<std::endl;
 }
 -(void)handleItemRemoved:(const gloox::JID& )jid{
-    //std::cout<<"item removed  : "<<jid.full()<<std::endl;
+    std::cout<<"item removed  : "<<jid.full()<<std::endl;
 }
 
 -(void)handleRosterPresence:(const gloox::RosterItem&) item resource:(const std::string& )resource presence:( gloox::Presence::PresenceType) presence message:(const std::string&)msg{
 
    gloox::RosterItem *tempItem=new gloox::RosterItem(item);
     
-    //m_data->setPresence(tempItem->jidJID(), presence,msg);
+    m_data->setPresence(tempItem->jidJID(), presence,msg);
    [self updateRosterData: tempItem];
    if(m_appDelegate->m_toJid){
 	  if(m_chatDelegate && item.jidJID().bare()==gloox::JID(m_appDelegate->m_toJid.UTF8String).bare()){
@@ -1755,7 +1786,7 @@
 	
 	  
 	  [UIView transitionWithView:m_presenceView.customView duration:2 options:UIViewAnimationOptionTransitionCrossDissolve animations:^{
-		   //std::cout<<"self presence "<<presence<<std::endl;
+		   std::cout<<"self presence "<<presence<<std::endl;
 		 [self->m_presenceView setTitle:@"Online"];
 		 
 		
@@ -1773,17 +1804,17 @@
 }
 -(void)handleSubscriptionRequest:(const gloox::JID&)jid message:(const std::string&)msg{
    
-   //std::cout<<"subscription request : "<<jid.full()<<std::endl;
+   std::cout<<"subscription request : "<<jid.full()<<std::endl;
 }
 -(void)handleUnsubscriptionRequest:(const gloox::JID&)jid message:(const std::string&)msg{
-   //std::cout<<"Unsubscription request : "<<jid.full()<<std::endl;
+   std::cout<<"Unsubscription request : "<<jid.full()<<std::endl;
 }
 -(void)handleNonrosterPresence:(const gloox::Presence&) presence{
-   //std::cout<<"Non Roster presence: "<<presence.presence()<<"  from JId :"<<presence.from().full()<<std::endl;
+   std::cout<<"Non Roster presence: "<<presence.presence()<<"  from JId :"<<presence.from().full()<<std::endl;
  
 }
 -(void)handleRosterError:( const  gloox::IQ& )iq{
-   //std::cout<<"Roster Error "<<iq.embeddedTag()->xmlns()<<std::endl;
+   std::cout<<"Roster Error "<<iq.embeddedTag()->xmlns()<<std::endl;
 }
 /*
 -(void)d{
@@ -1873,13 +1904,13 @@
 	  
 	  
 	
-		 // //std::cout<<"clicked"<<std::endl;
+		 // std::cout<<"clicked"<<std::endl;
 		
 		// if(m_xmppEngine->getRoster()->roster()->size()){
 		//	m_xmppEngine->m_to= std::pair<const std::string,gloox::RosterItem*>();
 		//	NSString *m_phoneJid=((PartnerTableViewCell*)[tableView cellForRowAtIndexPath:indexPath])->m_phoneNumber;
 		//	gloox::Roster::iterator it=m_xmppEngine->getRoster()->roster()->find(std::string([m_phoneJid UTF8String])+"@"+m_xmppEngine->getServer());
-		//	m_xmppEngine->setToJId(std::pair<std::string, gloox::RosterItem *>(it->first,it->second));
+			
 		 
 		 //}
 	
@@ -1888,17 +1919,25 @@
 		 //NSDictionary *attr=@{NSStrokeColorAttributeName:color};
 		 //NSMutableAttributedString * nameAttr=[[NSMutableAttributedString alloc]initWithString:name attributes:attr];
 		 PartnerTableViewCell *tmpCell=(PartnerTableViewCell*)[tableView cellForRowAtIndexPath:indexPath];
+	   
 		 if(!tmpCell)
 			return;
+	     std::string noti_node =m_data->isPartnerExisting(tmpCell->m_jid).noti_pubsub_node;
+		 if(noti_node.empty()){
+			   m_xmppEngine->subscribToNodeItemNoti(gloox::JID(tmpCell->m_jid));
+		
+		 }
+	  
 		 gloox::JID tmpJid=gloox::JID();
-		 tmpJid=tmpCell->m_jid;
+		 tmpJid=gloox::JID(tmpCell->m_jid);
+	      m_xmppEngine->setToJId(tmpJid);
 		 [self viewPartnerChat:tmpJid userName:tmpCell->m_name.text];
 		 tmpCell->m_msgeBadge.text=@"";
 		 //m_xmppEngine->m_topImage=tmpCell->m_photos.image;
 	
 	
    } catch (std::exception errcpp) {
-	  	//std::cout<<"row selection err c++ :"<<errcpp.what()<<std::endl;
+	  	std::cout<<"row selection err c++ :"<<errcpp.what()<<std::endl;
    }catch (NSException *errobjc){
 	  NSLog(@"row selection err objc %@:",[errobjc description]);
    }
@@ -1936,6 +1975,7 @@ if(curNumbOfPart!=prevNum){
 	 [ m_rosterTableView beginUpdates];
 	 [ m_rosterTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationTop];
 	 [m_rosterTableView endUpdates];
+   [self displayChatIcon];
 }else{
    for(int i=0;i<(int)curNumbOfPart;++i){
 	  PartnerTableViewCell *cell1=[m_rosterTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:i inSection:0]];
@@ -1951,7 +1991,7 @@ if(curNumbOfPart!=prevNum){
   
 
    
-   //std::cout<<"hey mr. shuffle size prev "<<prevNum<<"\t || cur "<<curNumbOfPart<<std::endl;
+   std::cout<<"hey mr. shuffle size prev "<<prevNum<<"\t || cur "<<curNumbOfPart<<std::endl;
 
    
 	  
@@ -2112,30 +2152,94 @@ if(curNumbOfPart!=prevNum){
 }
 
 -(void)handlePrivacyListNames:(const std::string&) active def: (const std::string &)def privacyList:( const gloox::StringList &)lists{
-   //std::cout<< "handlePrivacyListNames "<< active<<" "<<def<<std::endl;
+   std::cout<< "handlePrivacyListNames "<< active<<" "<<def<<std::endl;
+   if(m_accountDelegate){
+	  [m_accountDelegate handlePrivacyListNames:active def:def privacyList:lists];
+   }
+   
+   
    for (std::string list : lists) {
 	  NSLog(@"handlePrivacyListNames %s",list.c_str());
+	  
+	  
    }
+   
   
 }
 -(void)handlePrivacyList: (const std::string &)name  privacyList:(const gloox::PrivacyListHandler::PrivacyList &)items{
+   
+   std::vector<gloox::PrivacyItem> list={};
    for (auto item : items) {
-	  NSLog(@"handlePrivacyLis %u",item.action());
+	  list.push_back(item);
+	 
+	  m_data->setBlockPartner(item.value(),item.action());
+	  int index=0;
+	  for(auto tmpPart:m_data->chatRoster()){
+		 
+		 if(tmpPart.jid==item.value()){
+			PartnerTableViewCell *tmpCell=[m_rosterTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
+			if(!tmpCell)
+			   continue;
+			if(!item.action()){
+			   NSLog(@"handlePrivacyLis99ee9 %s\t%i",item.value().c_str(),item.action());
+			   [self->m_rosterTableView beginUpdates];
+			   NSMutableAttributedString *originalMutableAttributedString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithUTF8String:tmpPart.name.c_str()]];;
+			   NSRange originalRange = NSMakeRange(0, originalMutableAttributedString.length);
+			   [originalMutableAttributedString setAttributes:@{} range:originalRange];
+			   [tmpCell->m_name setAttributedText:originalMutableAttributedString];
+			   [self->m_rosterTableView endUpdates];
+			}else{
+			  
+			   [self->m_rosterTableView beginUpdates];
+			   NSMutableAttributedString *attributeString = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithUTF8String:tmpPart.name.c_str()]];
+			   [attributeString addAttribute:NSStrikethroughStyleAttributeName
+									   value:@2
+									   range:NSMakeRange(0, [attributeString length])];
+			   [tmpCell->m_name setAttributedText:attributeString];
+			   [self->m_rosterTableView endUpdates];
+		 
+			   
+			}
+		 }
+		 
+		 ++index;
+	  }
    }
+   if(m_accountDelegate){
+	  [m_accountDelegate handlePrivacyList:name privacyList:list];
+   }
+   
 }
 -(void)handlePrivacyListChanged: (const std::string &)name{
    NSLog(@"handlePrivacyListChanged");
+   if(m_accountDelegate){
+	  [m_accountDelegate handlePrivacyListChanged:name];
+   }
 }
 -(void)handlePrivacyListResult: (const std::string &)_id result:(gloox::PrivacyListResult) plResult{
-   NSLog(@"handlePrivacyListResult  ");
+   
+   if(m_accountDelegate){
+	  [m_accountDelegate handlePrivacyListResult:_id result:plResult];
+   }
+   NSLog(@"handlePrivacyListResult ");
 }
 -(NSString *)groupPath{
    NSString *appGroupDirectoryPath = [[[NSFileManager defaultManager] containerURLForSecurityApplicationGroupIdentifier:@"group.guys"] path];
    NSString *dataPath = [appGroupDirectoryPath stringByAppendingPathComponent:@"ContactInfo"];
-   
    return dataPath;
 }
 
+-(void)setAcountViewConDelegate:(id<AccountViewDelegate> )delegate{
+   m_accountDelegate=delegate;
+}
+
+-(void)      handleSubscriptionResult:(const std::string &) _id serviceName:(const gloox::JID &)service nodeName:(const std::string &)node SID:(const std::string &)sid JID:(const gloox::JID&)  jid subscriptionType:(const gloox::PubSub::SubscriptionType) subType err:(const gloox::Error*) error{
+   if(!error){
+	  m_data->setPubSubNotification(m_xmppEngine->m_to.bare(), node);
+   }else{
+	  std::cout<<"error subscription not node : "<<node<<std::endl;
+   }
+}
 
 
 @end

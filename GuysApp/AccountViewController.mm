@@ -8,6 +8,79 @@
 
 #import "AccountViewController.h"
 
+@implementation PartBlockListCellView
+
+
+
+-(instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier{
+
+   self=[super initWithStyle:style reuseIdentifier:reuseIdentifier];
+   if(!self)
+      return self;
+    self->m_background=[[UILabel alloc] init];
+    self->m_name=[[UILabel alloc]init];
+    self->m_number=[[UILabel alloc]init];
+   
+
+   
+     self->m_background.translatesAutoresizingMaskIntoConstraints=NO;
+   
+    [self addSubview:m_background];
+   [m_background addSubview:m_name];
+   [m_background addSubview:m_number];
+   
+   
+   self->m_name.translatesAutoresizingMaskIntoConstraints=NO;
+    self->m_number.translatesAutoresizingMaskIntoConstraints=NO;
+   
+   
+  
+    //self->m_invite.numberOfLines=0;
+   // [self->m_invite setTextAlignment:NSTextAlignmentLeft];
+  
+   
+   [[m_background.leadingAnchor constraintEqualToAnchor:self.leadingAnchor constant:10] setActive:YES];
+   [[m_background.trailingAnchor constraintEqualToAnchor:self.trailingAnchor constant:-10] setActive:YES];
+  [[m_background.topAnchor constraintEqualToAnchor:self.topAnchor constant:10] setActive:YES];
+   [[m_background.bottomAnchor constraintEqualToAnchor:self.bottomAnchor constant:-10] setActive:YES];
+   
+   [[self->m_name.widthAnchor constraintEqualToAnchor:m_background.widthAnchor] setActive:YES];
+   [[self->m_name.topAnchor constraintEqualToAnchor:m_background.topAnchor constant:5] setActive:YES];
+   [[self->m_name.bottomAnchor constraintEqualToAnchor:m_background.bottomAnchor constant:-30] setActive:YES];
+   //[[self->m_name.leadingAnchor constraintEqualToAnchor:self->m_background.leadingAnchor constant:self.frame.size.width-50] setActive:YES];
+   
+   [[self->m_number.widthAnchor constraintEqualToAnchor:m_background.widthAnchor] setActive:YES];
+
+   [[self->m_number.bottomAnchor constraintEqualToAnchor:m_background.bottomAnchor constant:-10] setActive:YES];
+   [[m_number.leadingAnchor constraintEqualToAnchor:m_background.leadingAnchor constant:10] setActive:YES];
+   
+ 
+
+   [m_name setTextColor:[UIColor whiteColor]];
+   [m_number setTextColor:[UIColor whiteColor]];
+  
+   [m_number setTextColor:[UIColor lightGrayColor]];
+   [m_name   setFont:[UIFont systemFontOfSize:20 weight:UIFontWeightHeavy]];
+   
+   [m_number   setFont:[UIFont fontWithName:@"GillSans-Semibold" size:17]];
+   [m_name setTextAlignment:NSTextAlignmentCenter];
+   [self setSelectionStyle:UITableViewCellSelectionStyleNone];
+   [self setBackgroundColor:[UIColor clearColor]];
+   
+
+  
+   m_name.layer.cornerRadius=23;
+   m_name.layer.masksToBounds=YES;
+    
+    
+    
+   return self;
+}
+
+@end
+
+
+
 @interface AccountViewController ()
 
 @end
@@ -29,14 +102,27 @@
 @synthesize m_accountBtn;
 @synthesize m_phoneNum;
 @synthesize m_fullname;
-@synthesize m_notificationSwitch;
+@synthesize m_notificationBTN;
 @synthesize m_deleteAcount;
+@synthesize m_mainView;
+@synthesize m_partnerBlockLastTable;
+
+@synthesize  m_saveProfile;
 -(void)viewWillAppear:(BOOL)animated{
+    
+//    if(m_data->getUserInfo().JID==gloox::JID()){
+//       // [self setAccount];
+//    }
     NSString *fname=[NSString stringWithUTF8String:m_data->m_userInfo.FNAME.c_str()];
     NSString *lname=[NSString stringWithUTF8String:m_data->m_userInfo.LNAME.c_str()];
     if([fname length] || [lname length]){
         m_fullname.text=[[fname stringByAppendingString:@" "] stringByAppendingString:lname];
+        
     }
+    if([[self restorationIdentifier] isEqualToString:@"AccountViewController"]){
+        [self.navigationItem hidesBackButton];
+    }
+    
 }
 - (void)viewDidLoad {
 
@@ -51,19 +137,56 @@
     [m_usrDPGesture setDelegate:self];
     [m_fname setAttributedPlaceholder:[[NSAttributedString alloc]initWithString:@">>> your first name <<<" attributes:@{NSForegroundColorAttributeName:[UIColor grayColor]}]];
     [m_lname setAttributedPlaceholder:[[NSAttributedString alloc]initWithString:@">>> your last name <<<" attributes:@{NSForegroundColorAttributeName:[UIColor grayColor]}]];
-    [m_fullname setAttributedPlaceholder:[[NSAttributedString alloc]initWithString:@" >>> your name <<<" attributes:@{NSForegroundColorAttributeName:[UIColor grayColor]}]];
+   
+//    [m_fullname setAttributedPlaceholder:[[NSAttributedString alloc]initWithString:@" >>> your name <<<" attributes:@{NSForegroundColorAttributeName:[UIColor grayColor]}]];
     [m_usrDP addGestureRecognizer:m_usrDPGesture];
-    m_usrDP.layer.shadowRadius  = 1.5f;
-    m_usrDP.layer.shadowColor   = [UIColor colorWithRed:176.f/255.f green:199.f/255.f blue:226.f/255.f alpha:1.f].CGColor;
-    m_usrDP.layer.shadowOffset  = CGSizeMake(0.0f, 0.0f);
-    m_usrDP.layer.shadowOpacity = 0.9f;
-    m_usrDP.layer.masksToBounds = NO;
-
-    UIEdgeInsets shadowInsets     = UIEdgeInsetsMake(0, 0, -4.5f, 0);
-    UIBezierPath *shadowPath      = [UIBezierPath bezierPathWithRect:UIEdgeInsetsInsetRect(m_usrDP.bounds, shadowInsets)];
-    m_usrDP.layer.shadowPath    = shadowPath.CGPath;
     
-    m_usrDP.contentMode=UIViewContentModeScaleToFill;
+    m_usrDP.layer.masksToBounds = YES;
+    m_usrDP.layer.cornerRadius=125;
+    
+    m_fullname.layer.masksToBounds = YES;
+    m_fullname.layer.cornerRadius=25;
+    
+    m_phoneNum.layer.masksToBounds = YES;
+    m_phoneNum.layer.cornerRadius=25;
+    
+    m_saveProfile.layer.masksToBounds = YES;
+    m_saveProfile.layer.cornerRadius=25;
+    
+    m_privacyBtn.layer.masksToBounds = YES;
+    m_privacyBtn.layer.cornerRadius=25;
+    
+    m_notificationBTN.layer.masksToBounds = YES;
+    m_notificationBTN.layer.cornerRadius=25;
+    
+    m_accountBtn.layer.masksToBounds=YES;
+    [m_accountBtn.layer setCornerRadius:25];
+    m_mainView.layer.shadowOffset  = CGSizeZero;
+    m_mainView.layer.shadowOpacity = 1.f;
+    m_mainView.layer.shadowRadius=5;
+    m_mainView.layer.cornerRadius=10;                   
+   
+    
+    m_partnerBlockLastTable.layer.masksToBounds = YES;
+    m_partnerBlockLastTable.layer.cornerRadius=25;
+    
+    
+    
+    [m_partnerBlockLastTable registerClass:[PartBlockListCellView self] forCellReuseIdentifier:@"PartBlockListCellView"];
+    [m_partnerBlockLastTable setDataSource:self];
+    [m_partnerBlockLastTable setSeparatorColor:[UIColor whiteColor]];
+    [m_partnerBlockLastTable setDelegate:self];
+    [m_partnerBlockLastTable.layer  setBorderWidth:3];
+    [m_partnerBlockLastTable.layer setBorderColor:[UIColor colorNamed:@"main_view"].CGColor];
+    
+    
+    //m_mainView.layer.shadowColor=[UIColor whiteColor].CGColor;
+
+//    UIEdgeInsets shadowInsets     = UIEdgeInsetsMake(0, 0, -4.5f, 0);
+//    UIBezierPath *shadowPath      = [UIBezierPath bezierPathWithRect:UIEdgeInsetsInsetRect(m_usrDP.bounds, shadowInsets)];
+//    m_usrDP.layer.shadowPath    = shadowPath.CGPath;
+//
+    m_usrDP.contentMode=UIViewContentModeScaleAspectFit;
     m_indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleLarge];
     m_indicator.hidesWhenStopped = YES;
     m_indicator.frame = CGRectMake((m_usrDP.frame.size.width/2)-100, (m_usrDP.frame.size.height/2)-100, 200, 200);
@@ -74,6 +197,10 @@
     
     m_appDelegate=(AppDelegate*)[[UIApplication sharedApplication]delegate];
     m_data=(AppData*)m_appDelegate->m_data;
+    ViewController *mainViewCon=(ViewController*)m_appDelegate->m_viewControllar;
+    if(mainViewCon){
+        [mainViewCon setAcountViewConDelegate:self];
+    }
 //    if([m_appDelegate getNotificaitionSettings]){
 //        [m_notificationSwitch setOn:YES];
 //    }else{
@@ -87,6 +214,8 @@
     [m_phoneNum setText:[@"+" stringByAppendingString:number]];
     NSString *fname=[NSString stringWithUTF8String:m_data->m_userInfo.FNAME.c_str()];
     NSString *lname=[NSString stringWithUTF8String:m_data->m_userInfo.LNAME.c_str()];
+    [m_fname setText:fname];
+    [m_lname setText:lname];
     if([fname length] || [lname length]){
         m_fullname.text=[[fname stringByAppendingString:@" "] stringByAppendingString:lname];
     }
@@ -99,7 +228,7 @@
             
             NSData *photoData=[[NSData alloc]initWithBase64EncodedString:photoString options:0];
             
-            //std::cout<<" user dp size :"<<imgData.size()<<std::endl;
+            std::cout<<" user dp size :"<<imgData.size()<<std::endl;
             UIImage *img=[UIImage imageWithData:photoData];
             if(img.size.height){
                [m_usrDP setImage:img];
@@ -107,7 +236,7 @@
               
            }
            
-            //std::cout<<"DP was set"<<std::endl;
+            std::cout<<"DP was set"<<std::endl;
         } catch (std::exception etc) {
             
         }
@@ -129,6 +258,8 @@
     if(!m_fname.text.length && !m_lname.text.length){
         
     }else{
+        
+        [m_fullname setText:[[m_fname.text stringByAppendingString:@" "] stringByAppendingString:m_lname.text]];
         std::thread([self](const std::string fn,const std::string ln){
             gloox::VCard *tmpVC=new gloox::VCard();
             const std::string code=m_data->getUserInfo().extCODE;
@@ -193,7 +324,7 @@
 -(void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary<UIImagePickerControllerInfoKey,id> *)info{
     m_realSelectedImg=[[UIImage alloc]init];
     m_realSelectedImg=[info objectForKey:UIImagePickerControllerOriginalImage];
-    //std::cout<<"h "<<m_realSelectedImg.size.height<<" w "<<m_realSelectedImg.size.width<<std::endl;
+    std::cout<<"h "<<m_realSelectedImg.size.height<<" w "<<m_realSelectedImg.size.width<<std::endl;
 
     [picker dismissViewControllerAnimated:YES completion:^{
     }];
@@ -579,16 +710,19 @@ static inline double radians (double degrees) {return degrees * M_PI/180;}
                 return;
             }
                 break;
+            default:
+                break;
         }
     }];
     UIImagePickerController * imagePicker=[[UIImagePickerController alloc]init];
+    
     [imagePicker setDelegate:self];
     
     UIAlertController *photOption=[UIAlertController alertControllerWithTitle:@"Change DP" message:@"" preferredStyle:UIAlertControllerStyleAlert];
     [photOption addAction:[UIAlertAction actionWithTitle:@"From Photos" style:UIAlertActionStyleDefault handler:^(UIAlertAction * _Nonnull action) {
         
-        [imagePicker setMediaTypes:[UIImagePickerController availableMediaTypesForSourceType:UIImagePickerControllerSourceTypePhotoLibrary] ];
-    
+        //[imagePicker setMediaTypes:[UIImagePickerController availableMediaTypesForSourceType:UIImagePickerControllerSourceTypeSavedPhotosAlbum] ];
+        [imagePicker setSourceType:UIImagePickerControllerSourceTypePhotoLibrary];
         [self presentViewController:imagePicker animated:YES completion:^{
             
         }];
@@ -598,7 +732,7 @@ static inline double radians (double degrees) {return degrees * M_PI/180;}
         [imagePicker setCameraDevice:UIImagePickerControllerCameraDeviceRear];
         [imagePicker setShowsCameraControls:YES];
         self->m_fromCamera=true;
-        //std::cout<<"close"<<std::endl;
+        std::cout<<"close"<<std::endl;
         [self presentViewController:imagePicker animated:YES completion:^{
        
         }];
@@ -619,8 +753,8 @@ static inline double radians (double degrees) {return degrees * M_PI/180;}
         UIGraphicsBeginImageContext(m_realSelectedImg.size);
  
         
-          UIGraphicsBeginImageContext(CGSizeMake(320, 380));
-          [m_realSelectedImg drawInRect:CGRectMake(0, 0, 320   , 380)];
+          UIGraphicsBeginImageContext(CGSizeMake(200, 200));
+          [m_realSelectedImg drawInRect:CGRectMake(0, 0, 200   , 200)];
           UIImage *newImage = UIGraphicsGetImageFromCurrentImageContext();
           UIGraphicsEndImageContext();
         
@@ -634,11 +768,7 @@ static inline double radians (double degrees) {return degrees * M_PI/180;}
         [m_usrDP setImage:[UIImage imageWithData:[[NSData alloc] initWithBase64EncodedString:tmDataString options:0 ]]]; ;
         m_data->setAccount(m_xmppEngine->getMyJID().bare(),m_data->m_userInfo.FNAME,m_data->m_userInfo.LNAME,m_data->m_userInfo.extCODE,cppImgString,m_data->m_userInfo.PUSH_ID);
         
-        
-//        m_usrDP.layer.cornerRadius=50;
-//        m_usrDP.layer.masksToBounds=YES;
-        
-        
+
         gloox::VCard *tmpVC=new gloox::VCard() ;
         tmpVC->setJabberid(m_data->getUserInfo().JID.bare());
         tmpVC->setMailer(m_data->getUserInfo().extCODE);
@@ -651,7 +781,7 @@ static inline double radians (double degrees) {return degrees * M_PI/180;}
             dispatch_async(dispatch_get_main_queue(), ^{
                 [self->m_indicator stopAnimating];
             });
-         
+           m_xmppEngine->publishNotification(XmppEgine::PUBSUB_NOTI_TYPE::PROFILE_UPDATE,"profile update",m_xmppEngine->getMyJID().full()+" updated his/her profile");
         },tmpVC);
         t.detach();
        
@@ -688,38 +818,50 @@ static inline double radians (double degrees) {return degrees * M_PI/180;}
     // Pass the selected object to the new view controller.
 }
 */
+//
+//-(void)textChanged:(UITextField *)textField{
+//    std::cout<<textField.text.UTF8String<<std::endl;
+//    if([textField.text UTF8String]==self->m_xmppEngine->getMyJID().username()){
+//        m_deleteAccountVerified=true;
+//    }else{
+//        m_deleteAccountVerified=false;
+//    }
+//    
+//}
 
--(void)textChanged:(UITextField *)textField{
-    if([textField.text UTF8String]==self->m_xmppEngine->getMyJID().username()){
-        m_deleteAccountVerified=true;
-    }else{
-        m_deleteAccountVerified=false;
-    }
-    
-}
 - (IBAction)deleteAccount:(id)sender {
-    
-    UIAlertController *cont=[UIAlertController alertControllerWithTitle:@"Delete Account" message:@"Verify By Entering Your Phone Number.." preferredStyle:UIAlertControllerStyleAlert];
+    if(!m_xmppEngine)
+        return;
+
+    UIAlertController *cont=[UIAlertController alertControllerWithTitle:@"Delete Account" message:[@"Verify By Entering Your Phone Number.. :"  stringByAppendingFormat:@"%s",self->m_xmppEngine->getMyJID().username().c_str()]preferredStyle:UIAlertControllerStyleAlert];
     [cont addTextFieldWithConfigurationHandler:^(UITextField * _Nonnull textField) {
+        [textField  setDelegate:self];
         [textField setPlaceholder:@"Your Phone Num: ...."];
-        [textField addTarget:self action:@selector(textChanged:) forControlEvents:UIControlEventValueChanged];
+       // [textField addTarget:self action:@selector(textChanged:) forControlEvents:UIControlEventValueChanged];
         
         
     }];
+    
+    
+   
     [cont addAction:[UIAlertAction actionWithTitle:@"Continue..." style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
         //add phone number extension to the textfield before delete
-        //[cont textFields][0].text
-        if(self->m_xmppEngine &&  self->m_deleteAccountVerified){
+        NSString * number=[cont textFields][0].text;
+        
+        if(self->m_xmppEngine && [number isEqualToString: [@"" stringByAppendingFormat:@"%s",self->m_xmppEngine->getMyJID().username().c_str()]]){
+            self->m_data->dropUserData(true);
             self->m_xmppEngine->deleteAccount();
-            self->m_data->dropUserData();
-            delete self->m_xmppEngine;
-            self->m_xmppEngine=nullptr;
             if(self->m_appDelegate)
-                self->m_appDelegate->m_xmppEngine=nullptr;
+             //   self->m_appDelegate->m_xmppEngine=nullptr;
             [self setAccount];
         }else{
-            
+            [cont setMessage:[@"Incorrect Number, it should match : "  stringByAppendingFormat:@"%s",self->m_xmppEngine->getMyJID().username().c_str()]];
+            [self presentViewController:cont animated:YES completion:nil];
         }
+        
+            
+      
+        
       
         
     }]];
@@ -734,9 +876,10 @@ static inline double radians (double degrees) {return degrees * M_PI/180;}
     dispatch_async(dispatch_get_main_queue(), ^{
         UIStoryboard * tmpStoryBoard=[UIStoryboard storyboardWithName:@"Main" bundle:nil];
         UIViewController* m_createAccountViewController=(UIViewController*) [tmpStoryBoard instantiateViewControllerWithIdentifier:@"CreateAccount"];
+        [m_createAccountViewController setModalPresentationStyle:UIModalPresentationFullScreen];
         //[self.tabBarController setHidesBottomBarWhenPushed:YES];
         //[self.navigationController setNavigationBarHidden:YES animated:YES];
-        [self presentViewController:m_createAccountViewController animated:YES completion:nil];
+        [self presentViewController:m_createAccountViewController animated:YES completion:nil ];
     });
     
 }
@@ -754,6 +897,65 @@ static inline double radians (double degrees) {return degrees * M_PI/180;}
         }
         
     }];
+}
+
+
+
+-(void)handlePrivacyListNames:(const std::string&) active def: (const std::string &)def privacyList:( const gloox::StringList &)lists{
+   std::cout<< "handlePrivacyListNames-- "<< active<<" "<<def<<std::endl;
+   for (std::string list : lists) {
+      NSLog(@"handlePrivacyListNames %s",list.c_str());
+   }
+    
+  
+}
+-(void)handlePrivacyList: (const std::string &)name  privacyList:(const std::vector<gloox::PrivacyItem> &)items{
+   for (auto item : items) {
+      NSLog(@"handlePrivacyList-- %u",item.action());
+   }
+    [m_partnerBlockLastTable reloadData];;
+}
+-(void)handlePrivacyListChanged: (const std::string &)name{
+   NSLog(@"handlePrivacyListChanged--");
+   
+}
+-(void)handlePrivacyListResult: (const std::string &)_id result:(gloox::PrivacyListResult) plResult{
+   NSLog(@"handlePrivacyListResult--  ");
+}
+
+
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    
+    int size=(int)m_data->getPartnerBlockList().size();
+    NSLog(@"Account Blocked Total : %i",size);
+    return size;
+}
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+  
+    PartBlockListCellView *cell=[m_partnerBlockLastTable dequeueReusableCellWithIdentifier:@"PartBlockListCellView" forIndexPath:indexPath];
+    AppData::PartnerInfoType part=m_data->getPartnerBlockList()[indexPath.row];
+    cell->m_name.text=[NSString stringWithUTF8String:part.name.c_str()];
+    cell->jid=part.jid;
+    cell->m_number.text=[NSString stringWithUTF8String:gloox::JID(part.jid).username().c_str()];
+    NSLog(@"Account Blocked Total : %s",part.name.c_str());
+    return  cell;
+}
+
+-(UISwipeActionsConfiguration *)tableView:(UITableView *)tableView trailingSwipeActionsConfigurationForRowAtIndexPath:(NSIndexPath *)indexPath{
+  
+    UIContextualAction *unBlockPartAction = [UIContextualAction contextualActionWithStyle:UIContextualActionStyleNormal title:@"Unblock" handler:^(UIContextualAction * _Nonnull action, __kindof UIView * _Nonnull sourceView, void (^ _Nonnull completionHandler)(BOOL))
+       {
+        PartBlockListCellView *cell=[self->m_partnerBlockLastTable cellForRowAtIndexPath:indexPath];
+        self->m_xmppEngine->unblockPartner(gloox::JID(cell->jid));
+           completionHandler (YES);
+       }];
+    [unBlockPartAction setBackgroundColor:[UIColor colorNamed:@"main_view"]];
+       
+       UISwipeActionsConfiguration *config = [UISwipeActionsConfiguration configurationWithActions:@[unBlockPartAction]];
+      return config;
+
+
+
 }
 
 @end

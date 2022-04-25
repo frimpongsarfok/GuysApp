@@ -36,6 +36,9 @@ public:
         std::string chat_priority;
         gloox::Presence::PresenceType presence;
         std::string pushID;
+        std::string noti_pubsub_node;
+        bool blocked;
+        
        
     };
     struct ChatInfo{
@@ -92,10 +95,12 @@ public:
     
      std::vector<std::tuple<std::string/*id*/,std::string/*to*/,std::string/*message*/,AppData::MESSAGETYPE/*type*/>> getAllUnsendChats();
     bool setAccount(const std::string jid,const std::string fname,const std::string lname,const std::string callingCode,const std::string photo={},const std::string token={});
-  
+    void setPubSubNotification(std::string jid,std::string node);
     bool createTables();
+    bool isPubSubCreated();
+    void  setPubSubCreated(bool);
     const AccountInfo getUserInfo();
-    bool dropUserData();
+    bool dropUserData(BOOL allData);
     std::pair<long/*msg size*/,bool/*new partner*/>  insertNewMessage(const std::string&msg_id,const std::string& from,const std::string& to,const std::string& msg,MESSAGETYPE type,const std::string& dateNtime="");
     std::vector<ChatInfo>& getChats(const std::string partnerJID);
     PartnerInfoType isPartnerExisting(std::string jid);
@@ -138,6 +143,11 @@ public:
     void updatePartGroupContactName(NSString *name, NSString *partJID);
     void setUserInfoInGroup(NSString* jid);
     void sortContact();
+    
+    
+    //privacy
+    void setBlockPartner(const std::string jid,bool toggle=false);
+    AppData::PartnersType getPartnerBlockList();
     
 };
 

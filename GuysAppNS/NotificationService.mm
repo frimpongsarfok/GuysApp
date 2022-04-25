@@ -32,7 +32,7 @@
     NSString* tmpNum=[self getInternationalNumber:num callingCode:extCod];
     NSString* nameStr=[self getName:tmpNum];
     self.bestAttemptContent.subtitle=nameStr;
-    //std::cout<<"\n\n\n\n\n Notification ssssssss \n\n\n\n\n\n\n"<<std::endl;
+    std::cout<<"\n\n\n\n\n Notification ssssssss \n\n\n\n\n\n\n"<<std::endl;
     self.contentHandler(self.bestAttemptContent);
 }
 

@@ -103,7 +103,8 @@
     if(_appDelegate)
        [_appDelegate application:application didFinishLaunchingWithOptions:launchOptions];
     //[[UIApplication sharedApplication]registerForRemoteNotifications];
-  
+   
+   
     
     //photo
 
@@ -144,8 +145,10 @@
      NSLog(@"App is on foreground");
     
   
-    if(_appDelegate)
+    if(_appDelegate){
         [_appDelegate applicationWillEnterForeground:application];
+        NSLog(@"App is on foreground");
+    }
 }
 
 

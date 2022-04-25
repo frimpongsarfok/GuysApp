@@ -25,6 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
    std::tuple<std::string,gloox::JID> m_currentRequestedVCardJID;
 }
 @property (weak, nonatomic) IBOutlet UISearchBar *m_searchContact;
+@property (weak, nonatomic) IBOutlet UIView *m_mainView;
 
 @property (weak, nonatomic) IBOutlet UITableView *m_emailTableView;
 -(void)handleVCard:(const gloox::JID) jid fetchResult:(gloox::VCard*) vcard;
@@ -37,7 +38,7 @@ NS_ASSUME_NONNULL_BEGIN
 @public
  UILabel *m_name;
  UILabel *m_number;
- UILabel *m_invite;
+
     std::string jid;
  UILabel *m_background;
 

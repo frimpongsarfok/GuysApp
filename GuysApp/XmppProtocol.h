@@ -58,6 +58,7 @@
 #import <gloox/privatexmlhandler.h>
 #include <gloox/chatstate.h>
 #include <gloox/pubsubmanager.h>
+#include <gloox/pubsubitem.h>
 #include <gloox/receipt.h>
 #include <fstream>
 
@@ -73,6 +74,10 @@
 #import "MyAVPlayerViewController.h"
 #import "ImageViewController.h"
 #import "AudioPlayerViews.h"
+#import <gloox/pubsub.h>
+#import <gloox/dataformfield.h>
+#import <gloox/pubsubevent.h>
+#import <gloox/tag.h>
 
 /*
 #import "AppDelegate.h"
@@ -124,51 +129,60 @@
 -(void) handleLastActivityResult:( const gloox::JID&) jid timeInSec: (long) seconds statusMsg:(const std::string&) status;
 -(void) handleLastActivityError :( const gloox::JID&) jid errorMsg:(gloox::StanzaError) error;
 //Pubsub
-   /*
--(void)     handleItem: (const gloox::JID &)service itemNode: (const std::string &)node itemEntry: (const gloox::Tag*)entry);
    
--(void)     handleItems:(const std::string &id, const gloox::JID &service, const std::string &node, const gloox::PubSub::ItemList &itemList, const gloox::Error *error=0);
+-(void)     handleItem: (const gloox::JID &)service itemNode: (const std::string &)node itemEntry: (const gloox::Tag*)entry;
    
--(void)     handleItemPublication (const std::string &id, const gloox::JID &service, const std::string &node ,const gloox::PubSub::ItemList &itemList, const gloox::Error *error=0);
+-(void)     handleItems:(const std::string &) _id serviceName:(const gloox::JID &)service nodeName:(const std::string &)node  items:(const gloox::PubSub::ItemList &)itemList err:( const gloox::Error *)error;
    
--(void)     handleItemDeletion (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::PubSub::ItemList &itemListclass , const class Error *error=0);
+-(void)     handleItemPublication:(const std::string &) _id serviceName:(const gloox::JID &)service nodeName:(const std::string &)node  items:(const gloox::PubSub::ItemList &)itemList err:( const gloox::Error *)error;
    
--(void)      handleSubscriptionResults (const std::string &id, const gloox::JID &service, const std::string &node, const std::string &sid, const gloox::JID &jid, const gloox::SubscriptionType subType, const gloox::Error *error=0);
+-(void)     handleItemDeletion :(const std::string &) _id serviceName:(const gloox::JID &)service nodeName:(const std::string &)node  items:(const gloox::PubSub::ItemList &)itemList err:( const gloox::Error *)error;
    
--(void)      handleUnsubscriptionResult (const std::string &id, const gloox::JID &service, const gloox::Error *error=0);
+-(void)      handleSubscriptionResult:(const std::string &) _id serviceName:(const gloox::JID &)service nodeName:(const std::string &)node SID:(const std::string &)sid JID:(const gloox::JID&)  jid subscriptionType:(const gloox::PubSub::SubscriptionType) subType err:(const gloox::Error*) error  ;
    
--(void)      handleSubscriptionOptions (const std::string &id, const gloox::JID &service, const gloox::JID &jid, const std::string &node, const gloox::DataForm *options, const std::string &sid=EmptyString, const gloox::Error *error=0);
+-(void)      handleUnsubscriptionResult: (const std::string &) id serviceName: (const gloox::JID &) service err:(const gloox::Error *)err;
    
--(void)      handleSubscriptionOptionsResult (const std::string &id, const gloox::JID &service, const gloox::JID &jid, const std::string &node, const std::string &sid=EmptyString, const gloox::Error *error=0);
+-(void)      handleSubscriptionOptions: (const std::string &) id serviceName:(const gloox::JID &) service JID:(const gloox::JID &)jid  service:(const std::string &) node subOptions:( const gloox::DataForm *) options SID:(const std::string &)sid err:(const gloox::Error *)error;
    
--(void)      handleSubscribers (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::PubSub::SubscriptionList &list, const gloox::Error *error=0);
+-(void)      handleSubscriptionOptionsResult:(const std::string &) id serviceName :(const gloox::JID &)service  JID:(const gloox::JID &) jid nodeName:(const std::string &)node  SID:(const std::string &)sid err:(const gloox::Error *)error;
    
--(void)      handleSubscribersResult (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::PubSub::SubscriberList *list, const gloox::Error *error=0);
+-(void)      handleSubscribers:(const std::string &) id serviceName:( const gloox::JID &) service nodeName:(const std::string &)node  subscriptionList:(const gloox::PubSub::SubscriptionList &)list err:( const gloox::Error *)error;
    
--(void)      handleAffiliates (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::PubSub::AffiliateList *list, const gloox::Error *error=0);
+-(void)      handleSubscribersResult: (const std::string &)id  serviceName:(const gloox::JID &) service nodeName:(const std::string &) node subscriptList:(const gloox::PubSub::SubscriberList *)list  err:( const gloox::Error *)error;
    
--(void)      handleAffiliatesResult (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::PubSub::AffiliateList *list, const gloox::Error *error);
+-(void)      handleAffiliates: (const std::string &) id serviceName:(const gloox::JID &) service nodeName:(const std::string &)node affiliationList:(const gloox::PubSub::AffiliateList *)list err:( const gloox::Error *)error;
    
--(void)      handleNodeConfig (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::DataForm *config, const gloox::Error *error=0);
+-(void)      handleAffiliatesResult:(const std::string &) id serviceName:(const gloox::JID &)service nodename:( const std::string &)node affiliationList:(const gloox::PubSub::AffiliateList *) list  err:(const gloox::Error *)error;
    
--(void)      handleNodeConfigResult (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::Error *error=0);
+-(void)      handleNodeConfig:(const std::string &)id serviceName:(const gloox::JID &)service nodeName:(const std::string &) node configuration:(const gloox::DataForm *) config err:(const gloox::Error *)error;
    
--(void)      handleNodeCreation (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::Error *error=0);
+-(void)      handleNodeConfigResult:(const std::string &) id  serviceName:(const gloox::JID &)service nodename:( const std::string &)node err:(const gloox::Error *)error;
    
--(void)      handleNodeDeletion (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::Error *error=0);
+-(void)      handleNodeCreation: (const std::string &) id serviceName:(const gloox::JID &)service nodename:( const std::string &)node err:(const gloox::Error *)error;
    
--(void)      handleNodePurge (const std::string &id, const gloox::JID &service, const std::string &node, const gloox::Error *error=0);
+-(void)      handleNodeDeletion :(const std::string &) id serviceName:(const gloox::JID &)service nodename:( const std::string &)node err:(const gloox::Error *)error;
    
--(void)      handleSubscriptions (const std::string &id, const gloox::JID &service, const gloox::PubSub::SubscriptionMap &subMap, const gloox::Error *error=0);
+-(void)      handleNodePurge:(const std::string &) id  serviceName:(const gloox::JID &)service nodename:( const std::string &)node err:(const gloox::Error *)error;
    
--(void)     handleAffiliations (const std::string &id, const gloox::JID &service, const gloox::PubSub::AffiliationMap &affMap, const gloox::Error *error=0);
+-(void)      handleSubscriptions:(const std::string &) id serviceName:(const gloox::JID &)service subcriptionMap:(const gloox::PubSub::SubscriptionMap &)subMap err:(const gloox::Error *)error;
    
--(void)      handleDefaultNodeConfig (const std::string &id, const gloox::JID &service, const gloox::DataForm *config, const gloox::Error *error=0);
+-(void)     handleAffiliations :(const std::string &) id serviceName:(const gloox::JID &)service affiliationMap:(const gloox::PubSub::AffiliationMap &)affMap err:(const gloox::Error *)error;
+   
+-(void)      handleDefaultNodeConfig :(const std::string &) id serviceName:(const gloox::JID &)service config:(const gloox::DataForm *)config err:(const gloox::Error *)error;
     
     
-    */
+    
 @end
 
 
+@protocol AccountViewDelegate <NSObject>
+
+
+-(void)handlePrivacyListNames:(const std::string&) active def: (const std::string &)def privacyList:( const gloox::StringList &)lists;
+-(void)handlePrivacyList: (const std::string &)name  privacyList:(const std::vector<gloox::PrivacyItem> &)items;
+-(void)handlePrivacyListChanged: (const std::string &)name;
+-(void)handlePrivacyListResult: (const std::string &)_id result:(gloox::PrivacyListResult) plResult;
+
+@end
 
 

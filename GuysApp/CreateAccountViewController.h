@@ -24,6 +24,7 @@
 @property (weak, nonatomic) IBOutlet UITextField *m_phoneNumber;
 @property (weak, nonatomic) IBOutlet UIPickerView *cntryCodePicker;
 @property (weak, nonatomic) IBOutlet UILabel *m_callingCode;
+@property (weak, nonatomic) IBOutlet UIView *m_mainView;
 
 @property (weak, nonatomic) IBOutlet UIButton *m_log;
 @property (weak, nonatomic) IBOutlet UIButton *m_delete_account;
