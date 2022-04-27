@@ -1073,7 +1073,7 @@
 			return;
     //dispatch_async(dispatch_get_main_queue(), ^{
    for (auto &ros : roster) {
-	  bool addRos=false;
+	
 	  
 	  gloox::JID jid=gloox::JID(ros.first);;
 	  AppData::AppData::PartnerInfoType  part=self->m_data->isPartnerExisting(jid.bare());
@@ -1971,7 +1971,7 @@
 }
 -(void)shuffleRow:(const gloox::JID )userJID preNumOfPart:(long )prevNum{
    long curNumbOfPart=m_data->chatRoster().size();
-if(curNumbOfPart!=prevNum){
+if(curNumbOfPart>prevNum){
 	 [ m_rosterTableView beginUpdates];
 	 [ m_rosterTableView insertRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:0 inSection:0]] withRowAnimation:UITableViewRowAnimationTop];
 	 [m_rosterTableView endUpdates];
@@ -2176,7 +2176,7 @@ if(curNumbOfPart!=prevNum){
 	  int index=0;
 	  for(auto tmpPart:m_data->chatRoster()){
 		 
-		 if(tmpPart.jid==item.value()){
+		 if(tmpPart.jid+"/iphone"==item.value()){
 			PartnerTableViewCell *tmpCell=[m_rosterTableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
 			if(!tmpCell)
 			   continue;

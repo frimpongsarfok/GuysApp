@@ -165,11 +165,13 @@ public:
     void addPartnertoPrivacyList(gloox::JID){
         
     }
+    
+
     void blockPartner(gloox::JID jid){
         if(clientIsconnected() && m_privacyManager){
-            gloox::PrivacyItem item(gloox::PrivacyItem::TypeJid,gloox::PrivacyItem::ActionDeny,gloox::PrivacyItem::PacketAll,jid.bare());
+            gloox::PrivacyItem item(gloox::PrivacyItem::TypeJid,gloox::PrivacyItem::ActionDeny,gloox::PrivacyItem::PacketAll,jid.bare()+"/iphone");
             m_partnerBlockList.remove_if([jid](gloox::PrivacyItem item){
-                return item.value()==jid.bare();
+                return item.value()==jid.bare()+"/iphone";
             });
             m_partnerBlockList.push_back(item);
             m_privacyManager->store("PartnerBlockedList",m_partnerBlockList);
@@ -178,9 +180,9 @@ public:
     }
     void unblockPartner(gloox::JID jid){
         if(clientIsconnected() && m_privacyManager){
-            gloox::PrivacyItem item(gloox::PrivacyItem::TypeJid,gloox::PrivacyItem::ActionAllow,gloox::PrivacyItem::PacketAll,jid.bare());
+            gloox::PrivacyItem item(gloox::PrivacyItem::TypeJid,gloox::PrivacyItem::ActionAllow,gloox::PrivacyItem::PacketAll,jid.bare()+"/iphone");
             m_partnerBlockList.remove_if([jid](gloox::PrivacyItem item){
-                return item.value()==jid.bare();
+                return item.value()==jid.bare()+"/iphone";
             });
             m_partnerBlockList.push_back(item);
             m_privacyManager->store("PartnerBlockedList",m_partnerBlockList);
@@ -202,7 +204,7 @@ public:
     }
     bool isPartnerBlocked(gloox::JID jid){
         for(gloox::PrivacyItem item:m_partnerBlockList){
-            if(jid.bare()==item.value() && item.action()==gloox::PrivacyItem::ActionDeny){
+            if(jid.bare()+"/iphone"==item.value() && item.action()==gloox::PrivacyItem::ActionDeny){
                 return true;
             }
         }
