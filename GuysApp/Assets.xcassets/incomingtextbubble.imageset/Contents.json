@@ -1,0 +1,23 @@
+{
+  "images" : [
+    {
+      "filename" : "kisspng-chat-room-computer-icons-online-chat-chat-box-5adfb69ec944c3.4472724215246107188244 (2).png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "kisspng-chat-room-computer-icons-online-chat-chat-box-5adfb69ec944c3.4472724215246107188244 (2)-1.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "kisspng-chat-room-computer-icons-online-chat-chat-box-5adfb69ec944c3.4472724215246107188244 (2)-2.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}
