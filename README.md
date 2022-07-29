@@ -1,4 +1,4 @@
 # GuysApp
 Message App
 
-XMPP is the open standard for messaging and presence
+XMPP open standard for messaging and presence
